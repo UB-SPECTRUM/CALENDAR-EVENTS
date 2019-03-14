@@ -5,7 +5,7 @@
         private const hostname = "localhost";
         private const dbusername = "root"; //getenv("UB_SPECTRUM_DB_USER");
         private const dbpassword = "";
-        private const dbName = "ubspectrum"; //getenv("UB_SPECTRUM_DB");
+        private const dbName = "spectrum"; //getenv("UB_SPECTRUM_DB");
         private static $conn;
        
         protected static function getDB(){

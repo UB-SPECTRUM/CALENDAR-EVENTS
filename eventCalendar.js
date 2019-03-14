@@ -77,7 +77,7 @@ $(function() {
 		},
 		// events: testEvents,
 		events: {
-			url: '/Events/fetchEvents.php',
+			url: '/ubspectrum/events/fetchEvents.php',
 			type: 'POST',
 			data: {
 				custom_param1: 'something',
@@ -93,7 +93,7 @@ $(function() {
 		height: 'parent',
 
 		eventClick: function(calEvent, jsEvent, view) {
-			window.location.href = `/Events/EventInfo.php?eventId=${calEvent.title}`;
+			window.location.href = `/ubspectrum/events/EventInfo.php?eventId=${calEvent.title}`;
 		},
 		bootstrapFontAwesome: {
 			close: 'fa-times',
@@ -107,7 +107,7 @@ $(function() {
 			addButton: {
 				text: 'Add an Event',
 				click: function() {
-					window.location.href = `/Events/AddEvent.php`;
+					window.location.href = `/ubspectrum/events/AddEvent.php`;
 				}
 			}
 		}
