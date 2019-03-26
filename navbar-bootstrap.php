@@ -66,6 +66,7 @@
                         <li data-dropnav-source="https://www.ubspectrum.com/section/dropnav.html?t=sports"><a href="https://www.ubspectrum.com/section/sports" class="sports ">Sports</a></li>
                         <li data-dropnav-source="https://www.ubspectrum.com/section/dropnav.html?t=opinion"><a href="https://www.ubspectrum.com/section/opinion" class="opinion ">Opinion</a></li>
                         <li data-dropnav-source="https://www.ubspectrum.com/section/dropnav.html?t=multimedia"><a href="https://www.ubspectrum.com/multimedia" class="multimedia ">Multimedia</a></li>
+                        <!-- <li><a href="http://localhost/ubspectrum/events/">Events</a></li> -->
                         <li><a href="https://www.ubspectrum.com/page/about">About</a></li>
                         <li><a href="https://www.ubspectrum.com/page/apply">Apply</a></li>
                         <li><a href="https://www.ubspectrum.com/page/advertise">Advertise</a></li>

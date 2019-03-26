@@ -160,7 +160,23 @@
 
         }
 
+        public static function getEventInfo($eventId){
+            $fetchedEvent = array("ID"=>'', "NAME"=>'', "VENUE"=>'',"DATE"=> '', "START_TIME" => '', "END_TIME"=>'',"CATEGORY"=>'',"DESCRIPTION"=>'',"LINK"=>'',"PHONE"=>'',"EMAIL"=>'',"COST"=>'',"UB_CAMPUS_LOCATION"=>'', "APPROVAL_STATUS"=>'');
+            $conn = self::getDB();
+            $eventId = $conn->real_escape_string($eventId);
+            $fetchFlyerQuery = "SELECT ID,NAME, ADDITIONAL_FILE, ADDITIONAL_FILE_SIZE, ADDITIONAL_FILE_TYPE,
+            VENUE, DATE_FORMAT(START_TIME, '%W %M %D, %Y') AS DATE, DATE_FORMAT(START_TIME, '%k:%i %p') AS START_TIME,DATE_FORMAT(END_TIME, '%k:%i %p') AS END_TIME, CATEGORY, DESCRIPTION, LINK, PHONE, EMAIL,COST, UB_CAMPUS_LOCATION, APPROVAL_STATUS  FROM tbl_events WHERE ID=$eventId;";
+            $result = mysqli_query($conn,$fetchFlyerQuery);
 
+            if($result != NULL){
+                while($row = mysqli_fetch_assoc($result))
+                {
+                   $fetchedEvent  = $row;
+                }
+            } 
+
+            return $fetchedEvent;
+        }
         
     }
 

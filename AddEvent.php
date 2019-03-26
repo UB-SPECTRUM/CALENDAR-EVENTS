@@ -9,7 +9,7 @@
 
     <title>Add an Event</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="/ubspectrum/pdfjs/build/pdf.js"></script>
+    <script src="/ubspectrum/javascript/pdfjs/build/pdf.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="tagify.min.js"></script>
@@ -450,7 +450,8 @@
                 <div class="col-xs-3">
                     <input type="hidden" name="event_id" value="">
                     <input type="hidden" name="contact_count" id="contact_count" value="1">
-                    <button class="btn btn-primary" onclick="javascript:void(0);" type="submit">Submit</button>
+                    <button type="button" class="btn btn-default" onclick="javascript:history.back();">Back</button>
+                    <button  class="btn btn-primary" onclick="javascript:void(0);" type="submit">Submit</button>
                 </div>
             </div>
         </form>

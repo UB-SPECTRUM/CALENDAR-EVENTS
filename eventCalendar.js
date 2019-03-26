@@ -43,6 +43,7 @@ $(document).ready(function() {
 	// page is now ready, initialize the calendar...
 	$('#toggleFiltersButton').click(function() {
 		$('#filterSection').toggle(300);
+		$(this).text($(this).text() == "Show Filters" ? "Hide Filters" : "Show Filters")
 	});
 	var input = document.querySelector('input[name=tags-outside]');
 	// init Tagify script on the above inputs
