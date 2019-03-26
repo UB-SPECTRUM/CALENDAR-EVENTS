@@ -1,8 +1,9 @@
 <?php
     header('content-type: application/json; charset=utf-8');
-    header("access-control-allow-origin: *");
+    // header("access-control-allow-origin: *");
 
     require_once "Models/Events.php";
+    require_once "Models/EventCategories.php";
 
    
 
@@ -30,7 +31,8 @@
     } 
 
     foreach ($result as $value) {
-        $formattedResults[] = array('title' => $value['NAME'], 'start' => $value['START_TIME'], 'end' => $value['END_TIME']);
+        $categories = EventCategories::getCategoriesForEvent($value['ID']);
+        $formattedResults[] = array('title' => $value['NAME'], 'start' => $value['START_TIME'], 'end' => $value['END_TIME'], 'description' => $value['DESCRIPTION'], 'id' => $value['ID'], 'categories'=> $categories);
     }
 
     

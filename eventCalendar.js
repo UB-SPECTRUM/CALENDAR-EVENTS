@@ -1,5 +1,4 @@
 var tagify;
-var categories;
 
 function clearSiblingInput(event) {
 	var handler = $(event.parentNode).siblings();
@@ -34,19 +33,13 @@ function makeCategoryOptions() {
 		(cat) =>
 			`<a class="dropdown-item ${cat.disabled === true
 				? 'disabled'
-				: ''}" href="javascript:onSelectTagFromDropdown('${cat.label}')" >${cat.label}</a>`
+				: ''}" href="javascript:onSelectTagFromDropdown('${cat.label}')" >${cat.icon ? `<i class="${cat.icon}"></i>` : '' } ${cat.label}</a>`
 	);
 	$('#category-menu').html(categoryMenu);
 }
 
-$(function() {
-	categories = [
-		{ label: 'Brainy', disabled: false },
-		{ label: 'Arty', disabled: false },
-		{ label: 'Sporty', disabled: false },
-		{ label: 'Fun', disabled: false },
-		{ label: 'Cheap', disabled: false }
-	];
+$(document).ready(function() {
+	
 	// page is now ready, initialize the calendar...
 	$('#toggleFiltersButton').click(function() {
 		$('#filterSection').toggle(300);
@@ -84,7 +77,7 @@ $(function() {
 				custom_param2: 'somethingelse'
 			},
 			error: function() {
-				alert('there was an error while fetching events!');
+				alert('Sorry, there was an error while fetching events. Please check again later.');
 			}
 		},
 		eventLimit: 3,
@@ -93,7 +86,7 @@ $(function() {
 		height: 'parent',
 
 		eventClick: function(calEvent, jsEvent, view) {
-			window.location.href = `/ubspectrum/events/EventInfo.php?eventId=${calEvent.title}`;
+			window.location.href = `/ubspectrum/events/EventInfo.php?eventId=${calEvent.id}`;
 		},
 		bootstrapFontAwesome: {
 			close: 'fa-times',
@@ -101,23 +94,52 @@ $(function() {
 			next: 'fa-chevron-right',
 			prevYear: 'fa-angle-double-left',
 			nextYear: 'fa-angle-double-right',
-			addButton: 'fa-plus'
+			// addButton: 'fa-plus'
 		},
 		customButtons: {
 			addButton: {
 				text: 'Add an Event',
-				click: function() {
+				click: function(event ,el) {
 					window.location.href = `/ubspectrum/events/AddEvent.php`;
 				}
 			}
-		}
+		},
+		eventRender: function(eventObj, $el) {
+			// $el.find('.fc-content').popover({
+			//   title: eventObj.title,
+			//   content: eventObj.description,
+			//   trigger: 'hover',
+			//   placement: 'top',
+			// });
+			let categories = eventObj.categories;
+			for (let index = 0; index < categories.length; index++) {
+				const category = categories[index];
+				let categoryIcon = categoryIconMapping[category.CATEGORY_ID];
+				$el.prepend(`<div style="display:inline-block" data-toggle="tooltip" data-placement="top" title="${category.NAME}"><i class="${categoryIcon}"></i>&nbsp;</div>`);
+			}
+			$el.find('.fc-content').css({display:'inline-block'});
+			
+			return $el;
+		  },
+		  eventAfterAllRender: function(){
+			// $('[data-toggle="popover"]').popover()
+			$('[data-toggle="tooltip"]').tooltip()
+		  }
 	});
 
 	makeCategoryOptions();
-	$('#datetimepicker1').datetimepicker({
-		format: 'LT'
+	$('#datetimepicker1').flatpickr({
+		enableTime: true,
+		noCalendar: true,
+		dateFormat: "h:i K",
 	});
-	$('#datetimepickerBefore').datetimepicker({
-		format: 'LT'
+	$('#datetimepickerBefore').flatpickr({
+		// format: 'LT'
+		enableTime: true,
+		noCalendar: true,
+		dateFormat: "h:i K",
+
 	});
+
+	
 });
