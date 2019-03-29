@@ -1,4 +1,9 @@
+<?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+session_start();
 
+ ?>
 <!DOCTYPE html>
 <html>
 
@@ -14,7 +19,7 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="tagify.min.js"></script>
     <link rel="stylesheet" href="tagify.css">
-    
+    <link rel="stylesheet" type="text/css" href="/ubspectrum/bootstrap/css/header.css">
 </head>
 
 <body>
@@ -31,14 +36,14 @@
 		// { label: 'Sporty', disabled: false,icon:'', description:'', value: '2' },
 		// { label: 'Fun', disabled: false,icon:'', description:'', value: '3' },
         // { label: 'Cheap', disabled: false,icon:'', description:'', value: '4' },
-        <?php 
+        <?php
         foreach ($categories as $value) {
             $label = $value['NAME'];
             $icon = $value['ICON'];
             $description = $value['DESCRIPTION'];
             $categoryId = $value['CATEGORY_ID'];
             echo "{label: '$label', icon: '$icon',description:'$description',value: '$categoryId', disabled: false },";
-        }    
+        }
         ?>
     ];
 
@@ -115,7 +120,7 @@
             let oldVal = $('#categories').val().split(',');
             let newVal = oldVal.filter(v => v != id || v == null || v == '');
             $('#categories').val(newVal.join(','))
-            
+
             makeCategoryOptions();
         });
         // add a class to Tagify's input element
@@ -133,7 +138,7 @@
             currentContactCount -= 1;
             $('#contact_count').val(currentContactCount);
             $(`#contact-${contactNumber}-group`).hide(300);
-            
+
             setTimeout(() => {
                 $(`#contact-${contactNumber}-group`).remove();
                 $('.contact-count').each( function( index, value ) {
@@ -201,19 +206,19 @@
             var canvas = document.createElement("canvas");
             canvas.width = document.getElementById('flyer-section').clientWidth;
             canvas.height = document.body.clientHeight / 2;
-            
+
             var scale = Math.min(canvas.width / vp.width, canvas.height / vp.height);
             return page.render({canvasContext: canvas.getContext("2d"), viewport: page.getViewport(scale)}).promise.then(function () {
                 return canvas;
             });
         }
 
-        
+
         ;
         function checkFile(e){
             if(e.target.files.length ==0 ) return;
 
-            var file = e.target.files[0]; 
+            var file = e.target.files[0];
 
             var ext = file.name.match(/\.([^\.]+)$/)[1];
             $('#flyer-section').empty();
@@ -248,17 +253,24 @@
                 case 'phone':
                     infoTargetElem.attr('type', 'text' );
                     infoTargetElem.attr('pattern', '\\d{3}[\\-]?\\d{3}[\\-]?\\d{4}' );
-                    
+
                     break;
                 case 'email':
                     infoTargetElem.attr('type', 'email' );
                     infoTargetElem.removeAttr('pattern');
 
                 break;
-            } 
+            }
         }
     </script>
-    <?php include('navbar-bootstrap.php')?>
+    <?php
+    if ($_SESSION == array() || !isset($_SESSION['sessionID'])) {
+        include('navbar-bootstrap.php');
+    } else {
+      include('admin-header.php');
+    }
+    ?>
+
     <div class="container-fluid">
         <div class="row">
             <div class="col-3" style="margin: 0 auto;">
@@ -266,6 +278,15 @@
             </div>
         </div>
         <form class="form-group" method="post" action="/ubspectrum/events/insertEvent.php" enctype="multipart/form-data">
+            <div class="row mb-3">
+                <div class="col-xs-12 col-md-4 text-md-right">
+                    <label for="poster_email">Posters Email<span class="required">*</span></label>
+                </div>
+                <div class="col-xs-12 col-md-4">
+                    <input type="email" name="addedBy" id="addedBy" class="form-control" maxlength="64" required />
+                    <p style="font-size:10px;">This email will not be posted on the calendar. By providing your email, you will get a nofication if your event has been Accepted or Declined and a way to update your event.</p>
+                </div>
+            </div>
             <div class="row mb-3">
                 <div class="col-xs-12 col-md-4 text-md-right">
                     <label for="name">Name<span class="required">*</span></label>
@@ -343,11 +364,11 @@
                     <label for="cost">Cost<span class="required">*</span></label>
                 </div>
                 <div class="col-xs-12 col-md-3 col-lg-2">
-                <div class="input-group"> 
+                <div class="input-group">
                     <span class="input-group-addon">$</span>
-                    <input type="text" name="cost" id="cost" class="form-control"/>
+                    <input type="number" id="eventCost" min="0" step="0.01" data-number-to-fixed="2" data-number-stepfactor="100" name="cost" id="cost" class="form-control"/>
                 </div>
-                   
+
                 </div>
             </div>
             <div class="row mb-3">
@@ -355,7 +376,7 @@
                     <label for="date">Date<span class="required">*</span></label>
                 </div>
                 <div class="col-xs-12 col-md-3 col-lg-2">
-                    <input type="text" name="date" id="date" class="form-control" maxlength="12" required />
+                    <input type="text" name="date" placeholder="Click to Select Date" id="date" class="form-control" maxlength="12" required />
                 </div>
             </div>
             <div class="row mb-3">
@@ -363,7 +384,7 @@
                     <label for="start_time">Start From<span class="required">*</span></label>
                 </div>
                 <div class="col-xs-12 col-md-3 col-lg-2">
-                    <input type="text" name="start_time" id="start_time" class="form-control" maxlength="10" required />
+                    <input type="text" name="start_time" id="start_time" placeholder="Click to Select Time" class="form-control" maxlength="10" required />
                 </div>
             </div>
             <div class="row mb-3">
@@ -371,7 +392,7 @@
                     <label for="end_time">End At<span class="required">*</span></label>
                 </div>
                 <div class="col-xs-12 col-md-3 col-lg-2">
-                    <input type="text" name="end_time" id="end_time" class="form-control" maxlength="10" required />
+                    <input type="text" name="end_time" id="end_time" placeholder="Click to Select Time" class="form-control" maxlength="10" required />
                 </div>
             </div>
             <div class="row mb-3">
@@ -457,39 +478,38 @@
         </form>
 
     </div>
-    <?php include('footer-bootstrap.php') ?>
+    <?php
+    if ($_SESSION == array() || !isset($_SESSION['sessionID'])) {
+      include('footer-bootstrap.php');
+    }
+    ?>
     <script>
         $('#date').flatpickr({
             // format: 'LT'
             enableTime: false,
-            allowInput: true,
-            altInput: true
+            //allowInput: true,
+            altInput: true,
+            minDate: new Date()
 
         });
         $('#start_time').flatpickr({
             enableTime: true,
             noCalendar: true,
             altFormat: "h:i K",
-            allowInput: true,
+            //allowInput: true,
             altInput: true,
             dateFormat: "H:i"
-
-
-
         });
         $('#end_time').flatpickr({
             enableTime: true,
             noCalendar: true,
             altFormat: "h:i K",
-            allowInput: true,
+            //allowInput: true,
             altInput: true,
             dateFormat: "H:i"
-
-
-
         });
 
-       
+
     </script>
 </body>
 

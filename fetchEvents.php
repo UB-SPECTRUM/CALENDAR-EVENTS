@@ -5,7 +5,7 @@
     require_once "Models/Events.php";
     require_once "Models/EventCategories.php";
 
-   
+
 
     // $startTime = htmlentities($_POST['start']) or '';
     // $endTime = htmlentities($_POST['end']) or '';
@@ -22,20 +22,20 @@
     // Events::addEvent("Event 7", "Location 7", date ("Y-m-d H:i:s",  strtotime('2019-03-15T13:30:00')),date ("Y-m-d H:i:s",  strtotime('2019-03-06T14:30:00')),"Test Description 7", "https://example.com", "$5.00", "877-777-7777", "email@email.com" );
     // Events::addEvent("Event 8", "Location 8", date ("Y-m-d H:i:s",  strtotime('2019-03-28T09:30:00')),date ("Y-m-d H:i:s",  strtotime('2019-03-06T13:30:00')),"Test Description 8", "https://example.com", "$5.00", "877-777-7777", "email@email.com" );
     // Events::addEvent("Event 9", "Location 9", date ("Y-m-d H:i:s",  strtotime('2019-03-15T13:30:00')),date ("Y-m-d H:i:s",  strtotime('2019-03-06T14:30:00')),"Test Description 9", "https://example.com", "$75.00", "877-777-7777", "email@email.com" );
-   
+
     $result = Events::getAll();
     $formattedResults = array();
     if($result == NULL){
         http_response_code(400);
         die();
-    } 
+    }
 
     foreach ($result as $value) {
         $categories = EventCategories::getCategoriesForEvent($value['ID']);
-        $formattedResults[] = array('title' => $value['NAME'], 'start' => $value['START_TIME'], 'end' => $value['END_TIME'], 'description' => $value['DESCRIPTION'], 'id' => $value['ID'], 'categories'=> $categories);
+        $formattedResults[] = array('title' => $value['NAME'], 'start' => $value['START_TIME'], 'end' => $value['END_TIME'], 'approve' => $value['APPROVAL_STATUS'], 'description' => $value['DESCRIPTION'], 'id' => $value['ID'], 'categories'=> $categories);
     }
 
-    
+
 
     echo json_encode($formattedResults);
 ?>

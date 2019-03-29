@@ -6,14 +6,14 @@
         public static function getAll($startTime = '', $endTime=''){
             $temparray = array();
             $conn = self::getDB();
-            
-            $fetchEventsQuery = "SELECT ID, NAME, VENUE, DATE_FORMAT(START_TIME, '%Y-%m-%dT%TZ') AS START_TIME,DATE_FORMAT(END_TIME, '%Y-%m-%dT%TZ') AS END_TIME, CATEGORY, DESCRIPTION, LINK, PHONE, EMAIL  FROM tbl_events WHERE 1=1";
+
+            $fetchEventsQuery = "SELECT ID, NAME, VENUE, APPROVAL_STATUS, DATE_FORMAT(START_TIME, '%Y-%m-%dT%TZ') AS START_TIME,DATE_FORMAT(END_TIME, '%Y-%m-%dT%TZ') AS END_TIME, CATEGORY, DESCRIPTION, LINK, PHONE, EMAIL  FROM tbl_events WHERE 1=1";
 
             if($startTime !== ''){
                 $startTime = $conn->real_escape_string($startTime);
                 $fetchEventsQuery .= "AND TIME >= $startTime ";
             }
-        
+
             if($endTime !== ''){
                 $endTime = $conn->real_escape_string($endTime);
                 $fetchEventsQuery .= "AND TIME <= $endTime ";
@@ -25,7 +25,7 @@
                 {
                     $temparray[] = $row;
                 }
-            } 
+            }
 
             return $temparray;
         }
@@ -42,7 +42,7 @@
                 {
                     $temparray[] = $row;
                 }
-            } 
+            }
 
             if(sizeof($temparray) > 0){
                 return $temparray[0];
@@ -51,9 +51,8 @@
             }
         }
 
-        public static function addEvent($name, $venue, $startTime, $endTime, $description, $link, $cost, $phone, $email,$ubCampusLocation="", $additionalFile="",$additionalFileSize="",$additionalFileType="", $approvalStatus = "pending", $addedBy="", $categories="", $contacts=array()){
+        public static function addEvent($name, $addedBy, $venue, $startTime, $endTime, $description, $link, $cost, $phone, $email,$ubCampusLocation="", $additionalFile="",$additionalFileSize="",$additionalFileType="", $approvalStatus = "pending", $categories="", $contacts=array()){
             $conn = self::getDB();
-
 
             $name = $conn->real_escape_string($name);
             $venue = $conn->real_escape_string($venue);
@@ -72,6 +71,13 @@
             $approvalStatus = $conn->real_escape_string($approvalStatus);
             $addedBy = $conn->real_escape_string($addedBy);
             $categories = $conn->real_escape_string($categories);
+
+            session_start();
+            if ($_SESSION == array() || !isset($_SESSION['sessionID'])) {
+              $approvalStatus = "pending";
+            } else {
+              $approvalStatus = "approved";
+            }
 
             $stmt = $conn->prepare("INSERT INTO tbl_events(
                 NAME,
@@ -130,11 +136,11 @@
                 $stmt =$conn->prepare("INSERT INTO tbl_event_categories
                     (`EVENT_ID`,
                     `CATEGORY_ID`)
-                    VALUES 
+                    VALUES
                     (?,?);
                 ");
                 foreach ($categoryIdList as $categoryId) {
-                    
+
                     $stmt->bind_param("ii", $last_id, $categoryId);
                     $stmt->execute();
                 }
@@ -147,7 +153,7 @@
                      `CONTACT_TYPE`,
                      `PERSON_NAME`,
                      `ADDITIONAL_INFO`)
-                    VALUES 
+                    VALUES
                     (?,?,?,?);
                 ");
                 foreach ($contacts as $contact) {
@@ -156,7 +162,7 @@
                 }
                 $stmt->close();
             }
-            
+
 
         }
 
@@ -173,11 +179,11 @@
                 {
                    $fetchedEvent  = $row;
                 }
-            } 
+            }
 
             return $fetchedEvent;
         }
-        
+
     }
 
 ?>
