@@ -15,7 +15,7 @@
     $date = $_POST['date'] or '';
     $start_time = $_POST['start_time'] or '';
     $end_time = $_POST['end_time'] or '';
-    $posted_by = $POST['addedBy'] or '';
+    $posted_by = $_POST['addedBy'] or '';
     $flyer="";
     $flyerSize="";
     $flyerType="";
