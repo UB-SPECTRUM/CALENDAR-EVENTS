@@ -73,6 +73,8 @@
                 <div class="row mb-3" id="filterSection" style="display: none;">
                     <div class="col-xs-12 col-md-4">
                         <h5>By Category</h5>
+                        <br/>
+
                         <div class="dropdown">
                             <div class="row">
                                 <div class="col-xs-6 col-md-4">
@@ -119,7 +121,17 @@
                     </div>
                     <div class="col-xs-12 col-md-4">
                         <h5>By Cost</h5>
-                        
+                        <br/>
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Cost
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="category-menu">
+                               
+                               
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -132,6 +144,22 @@
             </div>
         </div>
     </div>
+    <script>
+        function handleCost(elem){
+            console.log(elem)
+        }
+
+        (function(){
+            let costOptions = [{label:'Less than $20',value:'lt20'}];
+            let costOptionElems = costOptions.map(op => {
+                return `<a class="dropdown-item" href="javascript:handleCost(this);" data-val="${op.value}">
+                                    ${op.label}
+                        </a>`;
+            });
+
+            $('#cost-menu').html(costOptionElems);
+        })()
+    </script>
     <?php include('footer-bootstrap.php') ?>
 </body>
 
