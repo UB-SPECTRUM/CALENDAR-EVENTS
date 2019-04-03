@@ -3,7 +3,7 @@
 
     class Events extends DatabaseConnector {
 
-        public static function getAll($after = '', $before='', $categories=''){
+        public static function getAll($after = '', $before='', $categories='', $cost = ''){
             $temparray = array();
             $conn = self::getDB();
 
@@ -24,7 +24,32 @@
 
             if($before !== ''){
                 $before = $conn->real_escape_string($before);
-                $fetchEventsQuery .= " AND TIME(END_TIME) >= CAST('$before' AS time) ";
+                $fetchEventsQuery .= " AND TIME(END_TIME) <= CAST('$before' AS time) ";
+            }
+
+            if($cost != ''){
+                $cost = $conn->real_escape_string($cost);
+                switch ($cost) {
+                    case 'lt10':
+                        $fetchEventsQuery .= " AND COST < 10 ";
+                        break;
+                    case 'lt20':
+                        $fetchEventsQuery .= " AND COST BETWEEN 10 AND 20 ";
+                        break;
+                    case 'lt50':
+                        $fetchEventsQuery .= " AND COST BETWEEN 20 AND 50 ";
+                        break;
+                    case 'lt100':
+                        $fetchEventsQuery .= " AND COST BETWEEN 50 AND 100 ";
+                        $costAmount = 100;
+                        break;
+                    case 'gt100':
+                        $fetchEventsQuery .= " AND COST > 100 ";
+                        break;
+                    default:
+                        break;
+                }
+                
             }
 
             $result = mysqli_query($conn,$fetchEventsQuery);

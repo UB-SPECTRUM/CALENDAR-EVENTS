@@ -61,6 +61,16 @@ function makeCategoryOptions() {
 	$('#category-menu').html(categoryMenu);
 }
 
+function handleCost(elem){
+	elem = $(elem)
+	let newVal = elem.data('val');
+	$('#cost').val(newVal)
+	$('#cost-menu .dropdown-item').removeClass('active')
+	$(elem).addClass('active')
+	$('#calendar').fullCalendar('rerenderEvents');
+	$('#calendar').fullCalendar('refetchEvents');
+}
+
 $(document).ready(function() {
 	// page is now ready, initialize the calendar...
 	$('#toggleFiltersButton').click(function() {
@@ -122,7 +132,8 @@ $(document).ready(function() {
 				return {
 					after: $('#filterAfter').val(),
 					before: $('#filterBefore').val(),
-					categories: $('#categories').val()
+					categories: $('#categories').val(),
+					cost: $('#cost').val()
 				}
 			},
 			success: function(data){

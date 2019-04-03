@@ -5,19 +5,20 @@
     require_once "Models/Events.php";
     require_once "Models/EventCategories.php";
 
-
     $start = (isset($_POST['start']) && !empty($_POST['start'])) ? $_POST['start'] : '';
     $end = (isset($_POST['end']) && !empty($_POST['end'])) ? $_POST['end'] : '';
 
     $after = (isset($_POST['after']) && !empty($_POST['after'])) ? $_POST['after'] : '';
     $before = (isset($_POST['before']) && !empty($_POST['before'])) ? $_POST['before'] : '';
     $categories = (isset($_POST['categories']) && !empty($_POST['categories'])) ? $_POST['categories'] : '';
+    $cost = (isset($_POST['cost']) && !empty($_POST['cost'])) ? $_POST['cost'] : '';
     $categories = htmlentities($categories);
     $after = htmlentities($after);
     $before = htmlentities($before);
-
+    $cost = htmlentities($cost);
+    
     try {
-        $result = Events::getAll($after,$before,$categories);
+        $result = Events::getAll($after, $before, $categories, $cost);
         $formattedResults = array();
 
 

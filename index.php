@@ -122,12 +122,14 @@
                     <div class="col-xs-12 col-md-4">
                         <h5>By Cost</h5>
                         <br/>
+                        <input type="hidden" name="cost" id="cost"/>
+
                         <div class="dropdown">
                             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Cost
                             </button>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="category-menu">
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="cost-menu">
                                
                                
                             </div>
@@ -145,18 +147,15 @@
         </div>
     </div>
     <script>
-        function handleCost(elem){
-            console.log(elem)
-        }
+        
 
         (function(){
-            let costOptions = [{label:'Less than $20',value:'lt20'}];
+            let costOptions = [{label:'Less than $10',value:'lt10'}, {label:'$10 - $20 ',value:'lt20'}, {label:'$20 - $50 ',value:'lt50'}, {label:'$50 - $100 ',value:'lt100'}, {label:'More than $100 ',value:'gt100'}];
             let costOptionElems = costOptions.map(op => {
-                return `<a class="dropdown-item" href="javascript:handleCost(this);" data-val="${op.value}">
+                return `<a class="dropdown-item" onclick="javascript:handleCost(this);" data-val="${op.value}">
                                     ${op.label}
                         </a>`;
-            });
-
+            }).join('');
             $('#cost-menu').html(costOptionElems);
         })()
     </script>
