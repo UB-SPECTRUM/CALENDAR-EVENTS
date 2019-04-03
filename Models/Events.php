@@ -11,7 +11,7 @@
 
             if($categories != NULL && $categories != ''){
             // $categoryIdList = $conn->real_escape_string($categories);
-            $fetchEventsQuery = "SELECT ID, NAME, VENUE, APPROVAL_STATUS, DATE_FORMAT(START_TIME, '%Y-%m-%dT%TZ') AS START_TIME,DATE_FORMAT(END_TIME, '%Y-%m-%dT%TZ') AS END_TIME, CATEGORY, DESCRIPTION, LINK, PHONE, EMAIL  FROM tbl_events  
+            $fetchEventsQuery = "SELECT ID, NAME, VENUE, APPROVAL_STATUS, DATE_FORMAT(START_TIME, '%Y-%m-%dT%TZ') AS START_TIME,DATE_FORMAT(END_TIME, '%Y-%m-%dT%TZ') AS END_TIME, CATEGORY, DESCRIPTION, LINK, PHONE, EMAIL  FROM tbl_events
                                 WHERE APPROVAL_STATUS <>'delete' AND ID IN ( SELECT EVENT_ID FROM tbl_event_categories WHERE CATEGORY_ID IN ($categories))
                                 ";
 
@@ -21,7 +21,7 @@
                 $after = $conn->real_escape_string($after);
                 $fetchEventsQuery .= " AND TIME(START_TIME) >= CAST('$after' AS time) ";
             }
-        
+
             if($before !== ''){
                 $before = $conn->real_escape_string($before);
                 $fetchEventsQuery .= " AND TIME(END_TIME) >= CAST('$before' AS time) ";
@@ -84,7 +84,7 @@
             if ($_SESSION == array() || !isset($_SESSION['sessionID'])) {
               $approvalStatus = "pending";
             } else {
-              $approvalStatus = "approved";
+              $approvalStatus = "accepted";
             }
 
             $stmt = $conn->prepare("INSERT INTO tbl_events(

@@ -5,7 +5,7 @@
     require_once "Models/Events.php";
     require_once "Models/EventCategories.php";
 
-   
+
     $start = (isset($_POST['start']) && !empty($_POST['start'])) ? $_POST['start'] : '';
     $end = (isset($_POST['end']) && !empty($_POST['end'])) ? $_POST['end'] : '';
 
@@ -15,21 +15,21 @@
     $categories = htmlentities($categories);
     $after = htmlentities($after);
     $before = htmlentities($before);
-    
+
     try {
         $result = Events::getAll($after,$before,$categories);
         $formattedResults = array();
-        
-    
+
+
         foreach ($result as $value) {
             $categories = EventCategories::getCategoriesForEvent($value['ID']);
-            $formattedResults[] = array('title' => $value['NAME'], 'start' => $value['START_TIME'], 'end' => $value['END_TIME'], 'description' => $value['DESCRIPTION'], 'id' => $value['ID'], 'categories'=> $categories);
+            $formattedResults[] = array('title' => $value['NAME'], 'start' => $value['START_TIME'], 'end' => $value['END_TIME'], 'approve' => $value['APPROVAL_STATUS'], 'description' => $value['DESCRIPTION'], 'id' => $value['ID'], 'categories'=> $categories);
         }
-    
+
         echo json_encode($formattedResults);
     } catch (\Throwable $th) {
         http_response_code(400);
         die();
     }
-    
+
 ?>
