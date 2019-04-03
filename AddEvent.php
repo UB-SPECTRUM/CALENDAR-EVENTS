@@ -1,3 +1,9 @@
+<?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+session_start();
+
+ ?>
 <!DOCTYPE html>
 <html>
 
@@ -13,7 +19,7 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="tagify.min.js"></script>
     <link rel="stylesheet" href="tagify.css">
-
+    <link rel="stylesheet" type="text/css" href="/ubspectrum/bootstrap/css/header.css">
 </head>
 
 <body>
@@ -33,7 +39,7 @@
             $description = $value['DESCRIPTION'];
             $categoryId = $value['CATEGORY_ID'];
             echo "{label: '$label', icon: '$icon',description:'$description',value: '$categoryId', disabled: false },";
-        }    
+        }
         ?>
         ];
 
@@ -366,8 +372,32 @@
                     this.value = '';
             }
         };
+
+        function handleContactInfoType(radio){
+            let infoType = radio.value;
+            let infoTargetElem = $('#' + radio.name.replace('_opt', ''));
+            switch(infoType){
+                case 'phone':
+                    infoTargetElem.attr('type', 'text' );
+                    infoTargetElem.attr('pattern', '\\d{3}[\\-]?\\d{3}[\\-]?\\d{4}' );
+
+                    break;
+                case 'email':
+                    infoTargetElem.attr('type', 'email' );
+                    infoTargetElem.removeAttr('pattern');
+
+                break;
+            }
+        }
     </script>
-    <?php include('navbar-bootstrap.php')?>
+    <?php
+    if ($_SESSION == array() || !isset($_SESSION['sessionID'])) {
+        include('navbar-bootstrap.php');
+    } else {
+      include('admin-header.php');
+    }
+    ?>
+
     <div class="container-fluid">
         <div class="row">
             <div class="col-3" style="margin: 0 auto;">
@@ -376,6 +406,15 @@
         </div>
         <form class="form-group" method="post" action="/ubspectrum/events/insertEvent.php"
             enctype="multipart/form-data">
+            <div class="row mb-3">
+                <div class="col-xs-12 col-md-4 text-md-right">
+                    <label for="poster_email">Posters Email<span class="required">*</span></label>
+                </div>
+                <div class="col-xs-12 col-md-4">
+                    <input type="email" name="addedBy" id="addedBy" class="form-control" maxlength="64" required />
+                    <p style="font-size:10px;">This email will not be posted on the calendar. By providing your email, you will get a nofication if your event has been Accepted or Declined and a way to update your event.</p>
+                </div>
+            </div>
             <div class="row mb-3">
                 <div class="col-xs-12 col-md-4 text-md-right">
                     <label for="name">Name<span class="required">*</span></label>
@@ -456,10 +495,10 @@
                     <label for="cost">Cost<span class="required">*</span></label>
                 </div>
                 <div class="col-xs-12 col-md-3 col-lg-2">
-                    <div class="input-group">
-                        <span class="input-group-addon">$</span>
-                        <input type="text" name="cost" id="cost" class="form-control" data-type="money" required />
-                    </div>
+                <div class="input-group">
+                    <span class="input-group-addon">$</span>
+                    <input type="number" id="eventCost" min="0" step="0.01" data-number-to-fixed="2" data-number-stepfactor="100" name="cost" id="cost" class="form-control" data-type="money"/>
+                </div>
 
                 </div>
             </div>
@@ -468,8 +507,7 @@
                     <label for="date">Date<span class="required">*</span></label>
                 </div>
                 <div class="col-xs-12 col-md-3 col-lg-2">
-                    <input type="text" name="date" id="date" class="form-control" maxlength="12" required
-                        data-type="date" />
+                    <input type="text" name="date" placeholder="Click to Select Date" id="date" class="form-control" maxlength="12" required data-type="date" />
                 </div>
             </div>
             <div class="row mb-3">
@@ -477,8 +515,7 @@
                     <label for="start_time">Start From<span class="required">*</span></label>
                 </div>
                 <div class="col-xs-12 col-md-3 col-lg-2">
-                    <input type="text" name="start_time" id="start_time" class="form-control" maxlength="10" required
-                        data-type="time" />
+                    <input type="text" name="start_time" id="start_time" placeholder="Click to Select Time" class="form-control" maxlength="10" required data-type="time"/>
                 </div>
             </div>
             <div class="row mb-3">
@@ -486,8 +523,7 @@
                     <label for="end_time">End At<span class="required">*</span></label>
                 </div>
                 <div class="col-xs-12 col-md-3 col-lg-2">
-                    <input type="text" name="end_time" id="end_time" class="form-control" maxlength="10" required
-                        data-type="time" />
+                    <input type="text" name="end_time" id="end_time" placeholder="Click to Select Time" class="form-control" maxlength="10" required data-type="time"/>
                 </div>
             </div>
             <div class="row mb-3">
@@ -577,7 +613,11 @@
         </form>
 
     </div>
-    <?php include('footer-bootstrap.php') ?>
+    <?php
+    if ($_SESSION == array() || !isset($_SESSION['sessionID'])) {
+      include('footer-bootstrap.php');
+    }
+    ?>
     <script>
         $('#date').flatpickr({
             // format: 'LT'
@@ -585,7 +625,6 @@
             allowInput: true,
             altInput: true,
             minDate: "today"
-
         });
         $('#start_time').flatpickr({
             enableTime: true,
@@ -594,9 +633,6 @@
             allowInput: true,
             altInput: true,
             dateFormat: "H:i"
-
-
-
         });
         $('#end_time').flatpickr({
             enableTime: true,

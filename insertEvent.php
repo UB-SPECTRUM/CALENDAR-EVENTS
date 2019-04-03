@@ -3,8 +3,8 @@
     header("access-control-allow-origin: *");
 
     require_once "Models/Events.php";
-    
-    
+
+
 
     $name = $_POST['name'] or '';
     $venue = $_POST['venue'] or '';
@@ -15,22 +15,24 @@
     $date = $_POST['date'] or '';
     $start_time = $_POST['start_time'] or '';
     $end_time = $_POST['end_time'] or '';
+    $posted_by = $_POST['addedBy'] or '';
     $flyer="";
     $flyerSize="";
     $flyerType="";
     if(isset($_FILES['flyer'] ) && $_FILES['flyer']['tmp_name'] != null){
         $flyer = file_get_contents($_FILES['flyer']['tmp_name']);
         $flyerSize = $_FILES['flyer']['size'];
-        $file_info = new finfo(FILEINFO_MIME); 
-        $mime_type = $file_info->buffer($flyer);  
+        $file_info = new finfo(FILEINFO_MIME);
+        $mime_type = $file_info->buffer($flyer);
         $flyerType = $mime_type;
     }
-    
+
     $contact_count = $_POST['contact_count'] or 1;
     $eventId = $_POST['event_id'] or '';
     $ub_campus = $_POST['ub_campus'] or '';
     $categories =  $_POST['categories'] or '';
 
+   $posted_by = htmlentities(   $posted_by);
    $name = htmlentities(   $name);
    $venue = htmlentities(   $venue);
    $description = htmlentities(   $description);
@@ -61,10 +63,13 @@
         $contacts[] = array('name'=> $contactName, 'type' => $contactType, 'info' => $contactInfo);
     }
 
+    Events::addEvent($name, $posted_by, $venue, $start_time, $end_time, $description, $link, $cost, "", "", $ub_campus, $flyer, $flyerSize,$flyerType, "pending", $categories, $contacts );
 
-    Events::addEvent($name, $venue, $start_time, $end_time, $description, $link, $cost, "", "", $ub_campus, $flyer, $flyerSize,$flyerType, "pending", "", $categories, $contacts );
+    if ($_SESSION == array() || !isset($_SESSION['sessionID'])) {
+      $referer = dirname($_SERVER["HTTP_REFERER"]);
+      header("Location: $referer");
+    } else {
+      header("Location: /ubspectrum/admin/events/eventsAdmin.php");
+    }
 
-    $referer = dirname($_SERVER["HTTP_REFERER"]);
-    header("Location: $referer");
-    
 ?>
