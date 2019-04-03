@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 
@@ -14,24 +13,20 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="tagify.min.js"></script>
     <link rel="stylesheet" href="tagify.css">
-    
+
 </head>
 
 <body>
-<script>
-    <?php
+    <script>
+        <?php
           require_once "Models/EventCategories.php";
 
           $categories = EventCategories::getAll();
     ?>
 
-    var categories;
-    categories = [
-		// { label: 'Arty', disabled: false,icon:'', description:'', value: '5' },
-		// { label: 'Sporty', disabled: false,icon:'', description:'', value: '2' },
-		// { label: 'Fun', disabled: false,icon:'', description:'', value: '3' },
-        // { label: 'Cheap', disabled: false,icon:'', description:'', value: '4' },
-        <?php 
+        var categories;
+        categories = [
+            <?php 
         foreach ($categories as $value) {
             $label = $value['NAME'];
             $icon = $value['ICON'];
@@ -40,19 +35,19 @@
             echo "{label: '$label', icon: '$icon',description:'$description',value: '$categoryId', disabled: false },";
         }    
         ?>
-    ];
+        ];
 
-    function makeCategoryOptions() {
-	let categoryMenu = categories.map(
-		(cat) =>
-			`<a class="dropdown-item ${cat.disabled === true
+        function makeCategoryOptions() {
+            let categoryMenu = categories.map(
+                (cat) =>
+                `<a class="dropdown-item ${cat.disabled === true
 				? 'disabled'
 				: ''}" href="javascript:onSelectTagFromDropdown('${cat.value}')" >${cat.icon ? `<i class="${cat.icon}"></i>` : '' } ${cat.label}</a>`
-	);
-    $('#category-menu').html(categoryMenu);
-    }
+            );
+            $('#category-menu').html(categoryMenu);
+        }
 
-    function onSelectTagFromDropdown(id) {
+        function onSelectTagFromDropdown(id) {
             let cat = getCategoryById(id);
 
             if (cat.disabled === true) {
@@ -63,7 +58,7 @@
             cat.disabled = true;
             makeCategoryOptions();
             let oldVal = $('#categories').val();
-            if(oldVal == ''){
+            if (oldVal == '') {
                 $('#categories').val(id);
 
             } else {
@@ -72,80 +67,208 @@
             }
         }
 
-    function getCategoryByLabel(label) {
-        for (let i = 0; i < categories.length; i++) {
-            let cat = categories[i];
-            if (cat.label === label) {
-                return cat;
+        function getCategoryByLabel(label) {
+            for (let i = 0; i < categories.length; i++) {
+                let cat = categories[i];
+                if (cat.label === label) {
+                    return cat;
+                }
+            }
+
+            return null;
+        }
+
+        function getCategoryById(id) {
+            for (let i = 0; i < categories.length; i++) {
+                let cat = categories[i];
+                if (cat.value === id) {
+                    return cat;
+                }
+            }
+
+            return null;
+        }
+
+        function handleContactInfoType(radio) {
+            let infoType = radio.value;
+            let infoTargetElem = $('#' + radio.name.replace('_opt', ''));
+            switch (infoType) {
+                case 'phone':
+                    infoTargetElem.attr('type', 'text');
+                    infoTargetElem.data('type', 'phone');
+                    infoTargetElem.attr('pattern', '\\d{3}[\\-]?\\d{3}[\\-]?\\d{4}');
+
+                    break;
+                case 'email':
+                    infoTargetElem.attr('type', 'email');
+                    infoTargetElem.data('type', 'email');
+                    infoTargetElem.removeAttr('pattern');
+                    break;
             }
         }
 
-        return null;
-    }
+        function handleTime(){
+            let startTime = $('#start_time').val();
+            let endTime = $('#end_time').val()
 
-    function getCategoryById(id) {
-        for (let i = 0; i < categories.length; i++) {
-            let cat = categories[i];
-            if (cat.value === id) {
-                return cat;
+            let visibleSibling = $($(this).siblings('input')[0]);
+            let startVisibleSibling = $($('#start_time').siblings('input')[0]);
+            let endVisibleSibling = $($('#end_time').siblings('input')[0]);
+            
+            if(endTime == '' || startTime == ''){
+                return;
+            }
+
+            let happensBeforeEnd = false;
+            if(Date.parse('01/01/2011 ' + startTime) < Date.parse('01/01/2011 ' + endTime)){
+                happensBeforeEnd = true;
+            } else {
+                happensBeforeEnd = false;
+            }
+
+            if (happensBeforeEnd) {
+                // visibleSibling.removeClass('is-invalid').addClass('is-valid');
+                startVisibleSibling.removeClass('is-invalid').addClass('is-valid');
+                endVisibleSibling.removeClass('is-invalid').addClass('is-valid');
+            } else {
+                startVisibleSibling.removeClass('is-valid').addClass('is-invalid');
+                endVisibleSibling.removeClass('is-valid').addClass('is-invalid');
+                // visibleSibling.removeClass('is-valid').addClass('is-invalid');
+            }
+            
+        }
+
+
+        function validateInput() {
+            let input = $(this);
+            let isRequired = input.attr('required') ? true : false;
+            let type = input.data('type') || 'text';
+            let isValid = false;
+            if (isRequired && input.val() != '') {
+                isValid = true;
+            }
+
+            if (!isValid) {
+                input.removeClass('is-valid').addClass('is-invalid');
+            }
+            let value = input.val();
+
+            switch (type) {
+                case 'text':
+
+                    break;
+                case 'integer':
+                    break;
+                case 'money':
+
+                    let moneyPatternMatches = value.match(/^[+-]?[0-9]{1,3}(?:,?[0-9]{3})*(?:\.[0-9]{2})?$/);
+                    if (moneyPatternMatches != null) {
+                        isValid = true;
+                    } else {
+                        isValid = false;
+                    }
+                    break;
+                case 'date':
+                    let datePatternMatches = value.match(/[0-9]{4}-[0-9]{2}-[0-9]{1,2}/);
+                    if (datePatternMatches != null) {
+                        isValid = true;
+                    } else {
+                        isValid = false;
+                    }
+                    break;
+                case 'time':
+                    break;
+                case 'email':
+                    break;
+                case 'phone':
+                    let phonePatternMatches = value.match('\\d{3}[\\-]?\\d{3}[\\-]?\\d{4}');
+                    if (phonePatternMatches != null) {
+                        isValid = true;
+                    } else {
+                        isValid = false;
+                    }
+                    break;
+                case 'link':
+                    let urlPatternMatches = value.match(
+                        /(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/
+                        );
+                    if (urlPatternMatches != null) {
+                        isValid = true;
+                    } else {
+                        isValid = false;
+                    }
+                    break;
+            }
+
+            if (isValid) {
+                input.removeClass('is-invalid').addClass('is-valid');
+            } else {
+                input.removeClass('is-valid').addClass('is-invalid');
             }
         }
 
-        return null;
-    }
-    $(document).ready(function(){
-        var input = document.querySelector('input[name=tags-outside]');
-        // init Tagify script on the above inputs
-        tagify = new Tagify(input, {
-            tagTemplate : function(v, tagData){
-            return `<tag title='${tagData.label}'>
+
+
+        $(document).ready(function () {
+            var input = document.querySelector('input[name=tags-outside]');
+            // init Tagify script on the above inputs
+            tagify = new Tagify(input, {
+                tagTemplate: function (v, tagData) {
+                    return `<tag title='${tagData.label}'>
                             <x title=''></x>
                             <div>
                                 <i class="${tagData.icon}"></i>&nbsp;
                                 <span class='tagify__tag-text'>${tagData.label}</span>
                             </div>
                         </tag>`;
-            },
-        });
-        tagify.on('remove', function(e) {
-            let id = e.detail.data.value;
-            let cat = getCategoryById(id);
-            cat.disabled = false;
+                },
+            });
+            tagify.on('remove', function (e) {
+                let id = e.detail.data.value;
+                let cat = getCategoryById(id);
+                cat.disabled = false;
 
-            let oldVal = $('#categories').val().split(',');
-            let newVal = oldVal.filter(v => v != id || v == null || v == '');
-            $('#categories').val(newVal.join(','))
-            
+                let oldVal = $('#categories').val().split(',');
+                let newVal = oldVal.filter(v => v != id || v == null || v == '');
+                $('#categories').val(newVal.join(','))
+
+                makeCategoryOptions();
+            });
+            // add a class to Tagify's input element
+            tagify.DOM.input.classList.add('tagify__input--outside');
+
+            // re-place Tagify's input element outside of the  element (tagify.DOM.scope), just before it
+            tagify.DOM.scope.parentNode.insertBefore(tagify.DOM.input, tagify.DOM.scope);
             makeCategoryOptions();
-        });
-        // add a class to Tagify's input element
-        tagify.DOM.input.classList.add('tagify__input--outside');
 
-        // re-place Tagify's input element outside of the  element (tagify.DOM.scope), just before it
-        tagify.DOM.scope.parentNode.insertBefore(tagify.DOM.input, tagify.DOM.scope);
-        makeCategoryOptions();
-    })
-</script>
+            $('input').on('blur', validateInput);
+            $('#contact-section').on('blur','input', validateInput);
+            $('#start_time').on('change', handleTime);
+            $('#end_time').on('change', handleTime);
+            $('textarea').on('blur', validateInput);
+        })
+    </script>
 
     <script>
         var currentContactCount = 1;
-        function removeField(contactNumber){
+
+        function removeField(contactNumber) {
             currentContactCount -= 1;
             $('#contact_count').val(currentContactCount);
             $(`#contact-${contactNumber}-group`).hide(300);
-            
+
             setTimeout(() => {
                 $(`#contact-${contactNumber}-group`).remove();
-                $('.contact-count').each( function( index, value ) {
-                $(this).text(index+2)
-            })
+                $('.contact-count').each(function (index, value) {
+                    $(this).text(index + 2)
+                })
             }, 301);
         }
 
-        function addContactFields(){
-            if(currentContactCount > 10) return;
+        function addContactFields() {
+            if (currentContactCount > 10) return;
 
-            currentContactCount +=1;
+            currentContactCount += 1;
             $('#contact_count').val(currentContactCount);
 
             var fieldTemplate = `
@@ -165,7 +288,7 @@
                         <label for="contact_${currentContactCount}_name">Name<span class="required">*</span></label>
                     </div>
                     <div class="col-xs-12 col-md-4">
-                        <input type="text" name="contact_${currentContactCount}_name" class="form-control" maxlength="64" required/>
+                        <input type="text" name="contact_${currentContactCount}_name" class="form-control" maxlength="64" required />
                     </div>
                 </div>
                 <div class="row mb-2">
@@ -186,7 +309,7 @@
                     <div class="col-xs-12 col-md-4">
                         <label>Email</label>&nbsp;<input type="radio" name="contact_${currentContactCount}_info_opt" value="email" checked required onclick="handleContactInfoType(this);"/>&nbsp;&nbsp;
                         <label>Phone</label>&nbsp;<input type="radio" name="contact_${currentContactCount}_info_opt" value="phone" required onclick="handleContactInfoType(this);"/>
-                        <input type="email" name="contact_${currentContactCount}_info" id="contact_${currentContactCount}_info" class="form-control" maxlength="64" required />
+                        <input type="email" name="contact_${currentContactCount}_info" id="contact_${currentContactCount}_info" class="form-control" maxlength="64" required data-type="email"/>
                     </div>
                 </div>
             </div>
@@ -201,62 +324,48 @@
             var canvas = document.createElement("canvas");
             canvas.width = document.getElementById('flyer-section').clientWidth;
             canvas.height = document.body.clientHeight / 2;
-            
+
             var scale = Math.min(canvas.width / vp.width, canvas.height / vp.height);
-            return page.render({canvasContext: canvas.getContext("2d"), viewport: page.getViewport(scale)}).promise.then(function () {
+            return page.render({
+                canvasContext: canvas.getContext("2d"),
+                viewport: page.getViewport(scale)
+            }).promise.then(function () {
                 return canvas;
             });
         }
 
-        
-        ;
-        function checkFile(e){
-            if(e.target.files.length ==0 ) return;
 
-            var file = e.target.files[0]; 
+        ;
+
+        function checkFile(e) {
+            if (e.target.files.length == 0) return;
+
+            var file = e.target.files[0];
 
             var ext = file.name.match(/\.([^\.]+)$/)[1];
             $('#flyer-section').empty();
 
-            switch(ext)
-            {
+            switch (ext.toLowerCase()) {
                 case 'pdf':
-                // case 'jpg':
-                // case 'png':
+                    // case 'jpg':
+                    // case 'png':
                     var filePath = URL.createObjectURL(file);
                     pdfjsLib.getDocument(filePath).promise.then(function (doc) {
-                    // var pages = []; while (pages.length < doc.numPages) pages.push(pages.length + 1);
-                    var div = document.createElement("div");
-                    $('#flyer-section').append(div);
-                    return doc.getPage(1).then(makeThumb)
-                    .then(function (canvas) {
-                        div.appendChild(canvas);
-                    })
-                })
-                .catch(console.error);
+                            // var pages = []; while (pages.length < doc.numPages) pages.push(pages.length + 1);
+                            var div = document.createElement("div");
+                            $('#flyer-section').append(div);
+                            return doc.getPage(1).then(makeThumb)
+                                .then(function (canvas) {
+                                    div.appendChild(canvas);
+                                })
+                        })
+                        .catch(console.error);
                     break;
                 default:
                     alert('Sorry, only PDF files are allowed as the flyer');
-                    this.value='';
+                    this.value = '';
             }
         };
-
-        function handleContactInfoType(radio){
-            let infoType = radio.value;
-            let infoTargetElem = $('#' + radio.name.replace('_opt', ''));
-            switch(infoType){
-                case 'phone':
-                    infoTargetElem.attr('type', 'text' );
-                    infoTargetElem.attr('pattern', '\\d{3}[\\-]?\\d{3}[\\-]?\\d{4}' );
-                    
-                    break;
-                case 'email':
-                    infoTargetElem.attr('type', 'email' );
-                    infoTargetElem.removeAttr('pattern');
-
-                break;
-            } 
-        }
     </script>
     <?php include('navbar-bootstrap.php')?>
     <div class="container-fluid">
@@ -265,13 +374,15 @@
                 <h1 style="text-align:center;">Add an Event</h1>
             </div>
         </div>
-        <form class="form-group" method="post" action="/ubspectrum/events/insertEvent.php" enctype="multipart/form-data">
+        <form class="form-group" method="post" action="/ubspectrum/events/insertEvent.php"
+            enctype="multipart/form-data">
             <div class="row mb-3">
                 <div class="col-xs-12 col-md-4 text-md-right">
                     <label for="name">Name<span class="required">*</span></label>
                 </div>
                 <div class="col-xs-12 col-md-4">
-                    <input type="text" name="name" id="name" class="form-control" maxlength="64" required />
+                    <input type="text" name="name" id="name" class="form-control" maxlength="64" required
+                        data-type="text" />
                 </div>
             </div>
             <div class="row mb-3">
@@ -279,7 +390,8 @@
                     <label for="venue">Venue<span class="required">*</span></label>
                 </div>
                 <div class="col-xs-12 col-md-4">
-                    <input type="text" name="venue" id="venue" class="form-control" maxlength="64" required />
+                    <input type="text" name="venue" id="venue" class="form-control" maxlength="64" required
+                        data-type="text" />
                 </div>
             </div>
             <div class="row mb-3">
@@ -287,7 +399,8 @@
                     <label for="link">Link<span class="required">*</span></label>
                 </div>
                 <div class="col-xs-12 col-md-4">
-                    <input type="text" name="link" id="link" class="form-control" maxlength="1024" required />
+                    <input type="text" name="link" id="link" class="form-control" maxlength="1024" required
+                        data-type="link" />
                 </div>
             </div>
             <div class="row mb-3">
@@ -296,7 +409,7 @@
                 </div>
                 <div class="col-xs-12 col-md-4">
                     <textarea type="text" name="description" id="description" class="form-control" maxlength="1000"
-                        required></textarea>
+                        data-type="text" required></textarea>
                 </div>
             </div>
             <div class="row mb-3">
@@ -304,7 +417,7 @@
                     <label>Categories</label>
                 </div>
                 <div class="col-xs-12 col-md-4">
-                    <input type="hidden" name="categories" id="categories" value=""/>
+                    <input type="hidden" name="categories" id="categories" value="" />
                     <div class="dropdown">
                         <div class="row">
                             <div class="col-xs-6 col-md-4">
@@ -343,11 +456,11 @@
                     <label for="cost">Cost<span class="required">*</span></label>
                 </div>
                 <div class="col-xs-12 col-md-3 col-lg-2">
-                <div class="input-group"> 
-                    <span class="input-group-addon">$</span>
-                    <input type="text" name="cost" id="cost" class="form-control"/>
-                </div>
-                   
+                    <div class="input-group">
+                        <span class="input-group-addon">$</span>
+                        <input type="text" name="cost" id="cost" class="form-control" data-type="money" required />
+                    </div>
+
                 </div>
             </div>
             <div class="row mb-3">
@@ -355,7 +468,8 @@
                     <label for="date">Date<span class="required">*</span></label>
                 </div>
                 <div class="col-xs-12 col-md-3 col-lg-2">
-                    <input type="text" name="date" id="date" class="form-control" maxlength="12" required />
+                    <input type="text" name="date" id="date" class="form-control" maxlength="12" required
+                        data-type="date" />
                 </div>
             </div>
             <div class="row mb-3">
@@ -363,7 +477,8 @@
                     <label for="start_time">Start From<span class="required">*</span></label>
                 </div>
                 <div class="col-xs-12 col-md-3 col-lg-2">
-                    <input type="text" name="start_time" id="start_time" class="form-control" maxlength="10" required />
+                    <input type="text" name="start_time" id="start_time" class="form-control" maxlength="10" required
+                        data-type="time" />
                 </div>
             </div>
             <div class="row mb-3">
@@ -371,7 +486,8 @@
                     <label for="end_time">End At<span class="required">*</span></label>
                 </div>
                 <div class="col-xs-12 col-md-3 col-lg-2">
-                    <input type="text" name="end_time" id="end_time" class="form-control" maxlength="10" required />
+                    <input type="text" name="end_time" id="end_time" class="form-control" maxlength="10" required
+                        data-type="time" />
                 </div>
             </div>
             <div class="row mb-3">
@@ -380,6 +496,7 @@
                 </div>
                 <div class="col-xs-12 col-md-3 col-lg-2">
                     <input type="file" name="flyer" id="flyer" accept=".pdf" onchange="checkFile(event);" />
+                    <span>* PDF smaller than 16MB Only</span>
                 </div>
             </div>
             <div class="row mb-3">
@@ -425,10 +542,12 @@
                         <label for="contact_1_info">Information<span class="required">*</span></label>
                     </div>
                     <div class="col-xs-12 col-md-4">
-                        <label>Email</label>&nbsp;<input type="radio" name="contact_1_info_opt" value="email" checked onclick="handleContactInfoType(this);"
-                            required />&nbsp;&nbsp;
-                        <label>Phone</label>&nbsp;<input type="radio" name="contact_1_info_opt" value="phone"  onclick="handleContactInfoType(this);"/>
-                        <input type="email" name="contact_1_info" id="contact_1_info" class="form-control" maxlength="64" required />
+                        <label>Email</label>&nbsp;<input type="radio" name="contact_1_info_opt" value="email" checked
+                            onclick="handleContactInfoType(this);" required />&nbsp;&nbsp;
+                        <label>Phone</label>&nbsp;<input type="radio" name="contact_1_info_opt" value="phone"
+                            onclick="handleContactInfoType(this);" />
+                        <input type="email" name="contact_1_info" id="contact_1_info" class="form-control"
+                            maxlength="64" required data-type="email"/>
                     </div>
                 </div>
 
@@ -440,7 +559,8 @@
                 <br />
                 <div class="col-md-4 d-none d-md-block"></div>
                 <div class="col-xs-3">
-                    <button type="button" class="btn btn-info" onclick="addContactFields();"><i class="fa fa-plus"></i>&nbsp;Add
+                    <button type="button" class="btn btn-info" onclick="addContactFields();"><i
+                            class="fa fa-plus"></i>&nbsp;Add
                         Another Contact</button>
                 </div>
             </div>
@@ -451,7 +571,7 @@
                     <input type="hidden" name="event_id" value="">
                     <input type="hidden" name="contact_count" id="contact_count" value="1">
                     <button type="button" class="btn btn-default" onclick="javascript:history.back();">Back</button>
-                    <button  class="btn btn-primary" onclick="javascript:void(0);" type="submit">Submit</button>
+                    <button class="btn btn-primary" onclick="javascript:void(0);" type="submit">Submit</button>
                 </div>
             </div>
         </form>
@@ -463,7 +583,8 @@
             // format: 'LT'
             enableTime: false,
             allowInput: true,
-            altInput: true
+            altInput: true,
+            minDate: "today"
 
         });
         $('#start_time').flatpickr({
@@ -485,11 +606,15 @@
             altInput: true,
             dateFormat: "H:i"
 
-
-
         });
 
-       
+        $('form').on('keyup keypress', function(e) {
+            var keyCode = e.keyCode || e.which;
+            if (keyCode === 13) { 
+                e.preventDefault();
+                return false;
+            }
+        });
     </script>
 </body>
 

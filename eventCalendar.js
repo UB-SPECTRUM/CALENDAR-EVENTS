@@ -1,20 +1,31 @@
 var tagify;
-
+var calendar;
 function clearSiblingInput(event) {
 	var handler = $(event.parentNode).siblings();
 	handler.val('');
+	$('#calendar').fullCalendar('rerenderEvents');
+	$('#calendar').fullCalendar('refetchEvents');
 }
 
-function onSelectTagFromDropdown(tag) {
-	let cat = getCategoryByLabel(tag);
+function onSelectTagFromDropdown(id) {
+	let cat = getCategoryById(id);
 
-	if (tag.disabled === true) {
+	if (cat.disabled === true) {
 		return;
 	}
 
-	tagify.addTags(tag);
+	tagify.addTags([ cat ]);
 	cat.disabled = true;
 	makeCategoryOptions();
+	let oldVal = $('#categories').val();
+	if (oldVal == '') {
+		$('#categories').val(id);
+	} else {
+		$('#categories').val(`${oldVal},${id}`);
+	}
+
+	$('#calendar').fullCalendar('rerenderEvents');
+	$('#calendar').fullCalendar('refetchEvents');
 }
 
 function getCategoryByLabel(label) {
@@ -27,31 +38,59 @@ function getCategoryByLabel(label) {
 
 	return null;
 }
+function getCategoryById(id) {
+	for (let i = 0; i < categories.length; i++) {
+		let cat = categories[i];
+		if (cat.value === id) {
+			return cat;
+		}
+	}
+
+	return null;
+}
 
 function makeCategoryOptions() {
 	let categoryMenu = categories.map(
 		(cat) =>
 			`<a class="dropdown-item ${cat.disabled === true
 				? 'disabled'
-				: ''}" href="javascript:onSelectTagFromDropdown('${cat.label}')" >${cat.icon ? `<i class="${cat.icon}"></i>` : '' } ${cat.label}</a>`
+				: ''}" href="javascript:onSelectTagFromDropdown('${cat.value}')" >${cat.icon
+				? `<i class="${cat.icon}"></i>`
+				: ''} ${cat.label}</a>`
 	);
 	$('#category-menu').html(categoryMenu);
 }
 
 $(document).ready(function() {
-	
 	// page is now ready, initialize the calendar...
 	$('#toggleFiltersButton').click(function() {
 		$('#filterSection').toggle(300);
-		$(this).text($(this).text() == "Show Filters" ? "Hide Filters" : "Show Filters")
+		$(this).text($(this).text() == 'Show Filters' ? 'Hide Filters' : 'Show Filters');
 	});
 	var input = document.querySelector('input[name=tags-outside]');
 	// init Tagify script on the above inputs
-	tagify = new Tagify(input);
+	tagify = new Tagify(input, {
+		tagTemplate: function(v, tagData) {
+			return `<tag title='${tagData.label}'>
+						<x title=''></x>
+						<div>
+							<i class="${tagData.icon}"></i>&nbsp;
+							<span class='tagify__tag-text'>${tagData.label}</span>
+						</div>
+					</tag>`;
+		}
+	});
 	tagify.on('remove', function(e) {
-		let label = e.detail.data.value;
-		let cat = getCategoryByLabel(label);
+		let id = e.detail.data.value;
+		let cat = getCategoryById(id);
 		cat.disabled = false;
+
+		let oldVal = $('#categories').val().split(',');
+		let newVal = oldVal.filter((v) => v != id || v == null || v == '');
+		$('#categories').val(newVal.join(','));
+
+		$('#calendar').fullCalendar('rerenderEvents');
+		$('#calendar').fullCalendar('refetchEvents');
 		makeCategoryOptions();
 	});
 	// add a class to Tagify's input element
@@ -59,26 +98,51 @@ $(document).ready(function() {
 
 	// re-place Tagify's input element outside of the  element (tagify.DOM.scope), just before it
 	tagify.DOM.scope.parentNode.insertBefore(tagify.DOM.input, tagify.DOM.scope);
+	makeCategoryOptions();
 
-	$('#calendar').fullCalendar({
+	calendar = $('#calendar').fullCalendar({
 		// put your options and callbacks here
 		themeSystem: 'bootstrap4',
 		navLinks: true,
 		header: {
-			left: 'addButton',
+			left: '',
 			center: 'title',
 			right: 'today month,agendaWeek,agendaDay prev,next'
+		},
+		footer: {
+			left: '',
+			center: '',
+			right: 'addButton prev,next'
 		},
 		// events: testEvents,
 		events: {
 			url: '/ubspectrum/events/fetchEvents.php',
 			type: 'POST',
-			data: {
-				custom_param1: 'something',
-				custom_param2: 'somethingelse'
+			data: function(){
+				return {
+					after: $('#filterAfter').val(),
+					before: $('#filterBefore').val(),
+					categories: $('#categories').val()
+				}
 			},
-			error: function() {
-				alert('Sorry, there was an error while fetching events. Please check again later.');
+			success: function(data){
+				if(data == null || data.length == 0){
+					let notificationDiv = `<div class="alert alert-primary" role="alert" style="display:none;">
+						Looks like no events matched the filters!
+					</div>`;
+					
+					$('#notification-section').html(notificationDiv)
+					$('#notification-section').children().show(300)
+				} else {
+					$('#notification-section').children().hide(300)
+					setTimeout(function(){
+						$('#notification-section').html('')
+					}, 305)
+				}
+			},
+			error: function(err) {
+				alert('Sorry, something went wrong fetching the events. Please try again later.')
+				console.log(err);
 			}
 		},
 		eventLimit: 3,
@@ -94,13 +158,13 @@ $(document).ready(function() {
 			prev: 'fa-chevron-left',
 			next: 'fa-chevron-right',
 			prevYear: 'fa-angle-double-left',
-			nextYear: 'fa-angle-double-right',
+			nextYear: 'fa-angle-double-right'
 			// addButton: 'fa-plus'
 		},
 		customButtons: {
 			addButton: {
 				text: 'Add an Event',
-				click: function(event ,el) {
+				click: function(event, el) {
 					window.location.href = `/ubspectrum/events/AddEvent.php`;
 				}
 			}
@@ -116,31 +180,52 @@ $(document).ready(function() {
 			for (let index = 0; index < categories.length; index++) {
 				const category = categories[index];
 				let categoryIcon = categoryIconMapping[category.CATEGORY_ID];
-				$el.prepend(`<div style="display:inline-block" data-toggle="tooltip" data-placement="top" title="${category.NAME}"><i class="${categoryIcon}"></i>&nbsp;</div>`);
+				$el.prepend(
+					`<div style="display:inline-block" data-toggle="tooltip" data-placement="top" title="${category.NAME}"><i class="${categoryIcon}"></i>&nbsp;</div>`
+				);
 			}
-			$el.find('.fc-content').css({display:'inline-block'});
-			
+			$el.find('.fc-content').css({ display: 'inline-block' });
+
 			return $el;
-		  },
-		  eventAfterAllRender: function(){
+		},
+		eventAfterAllRender: function() {
 			// $('[data-toggle="popover"]').popover()
-			$('[data-toggle="tooltip"]').tooltip()
-		  }
+			$('[data-toggle="tooltip"]').tooltip();
+		}
 	});
 
 	makeCategoryOptions();
-	$('#datetimepicker1').flatpickr({
+
+	$('#filterAfter').flatpickr({ //show AM/PM, send 24-hr time
 		enableTime: true,
 		noCalendar: true,
-		dateFormat: "h:i K",
-	});
-	$('#datetimepickerBefore').flatpickr({
-		// format: 'LT'
-		enableTime: true,
-		noCalendar: true,
-		dateFormat: "h:i K",
+		altFormat: "h:i K",
+		allowInput: true,
+		altInput: true,
+		dateFormat: "H:i",
+		onClose: function(){
+			$('#calendar').fullCalendar('rerenderEvents');
+			$('#calendar').fullCalendar('refetchEvents');
+		}
+
+
 
 	});
+	$('#filterBefore').flatpickr({
+		enableTime: true,
+		noCalendar: true,
+		altFormat: "h:i K",
+		allowInput: true,
+		altInput: true,
+		dateFormat: "H:i",
+		onClose: function(){
+			$('#calendar').fullCalendar('rerenderEvents');
+			$('#calendar').fullCalendar('refetchEvents');
+		}
+	});
+
+	$($('#filterAfter').siblings('input')[0]).attr('style', 'width: 70%') //fix clear button going to next line
+	$($('#filterBefore').siblings('input')[0]).attr('style', 'width: 70%')
 
 	
 });

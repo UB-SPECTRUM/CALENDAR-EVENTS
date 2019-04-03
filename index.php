@@ -33,17 +33,13 @@
 <script>
     var categories;
     categories = [
-		// { label: 'Arty', disabled: false,icon:'', description:'' },
-		// { label: 'Sporty', disabled: false,icon:'', description:'' },
-		// { label: 'Fun', disabled: false,icon:'', description:'' },
-        // { label: 'Cheap', disabled: false,icon:'', description:'' },
         <?php 
         foreach ($categories as $value) {
             $label = $value['NAME'];
             $icon = $value['ICON'];
             $description = $value['DESCRIPTION'];
             $categoryId = $value['CATEGORY_ID'];
-            echo "{label: '$label', icon: '$icon',description:'$description',categoryId: $categoryId, disabled: false },";
+            echo "{label: '$label', icon: '$icon',description:'$description',value: '$categoryId', disabled: false },";
         }    
         ?>
     ];
@@ -61,6 +57,11 @@
     };
 </script>
     <div class="container-fluid" style="padding:10px">
+    <div class="row">
+        <div class="col-12" id="notification-section">
+            
+        </div>
+    </div>
         <div class="row">
             <div class="col">
 
@@ -70,7 +71,7 @@
                     </div>
                 </div> 
                 <div class="row mb-3" id="filterSection" style="display: none;">
-                    <div class="col-xs-12 col-md-6">
+                    <div class="col-xs-12 col-md-4">
                         <h5>By Category</h5>
                         <div class="dropdown">
                             <div class="row">
@@ -84,7 +85,8 @@
                                     </div>
                                 </div>
                                 <div class="col">
-                                    <input name='tags-outside' class='tagify--outside' style="display: none;">
+                                    <input name='tags-outside' class='tagify--outside' style="display: none;" >
+                                    <input type="hidden" name="categories" id="categories"/>
                                 </div>
                             </div>
 
@@ -92,14 +94,14 @@
 
                     </div>
 
-                    <div class="col-xs-12 col-md-6">
+                    <div class="col-xs-12 col-md-4">
                         <h5>By Time</h5>
                         <div class="row">
                             <div class="col-xs-12 col-md-6">
                                 <label>After</label>
                                 <div class="input-group date" data-target-input="nearest">
-                                    <input type="text" class="form-control" id="datetimepicker1" style="width: 80%" />
-                                    <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+                                    <input type="text" class="form-control" id="filterAfter" style="width: 80%" />
+                                    <div class="input-group-append" data-target="#filterAfter" data-toggle="datetimepicker">
                                             <div class="input-group-text clear-button" onclick="clearSiblingInput(this);"  ><i class="fa fa-times"></i></div>
                                     </div>
                                 </div>
@@ -107,15 +109,18 @@
                             <div class="col-xs-12 col-md-6">
                                 <label>Before</label>
                                 <div class="input-group date"  data-target-input="nearest">
-                                    <input type="text" class="form-control datetimepicker-input"id="datetimepickerBefore" style="width: 80%" />
-                                    <div class="input-group-append" data-target="#datetimepickerBefore" data-toggle="datetimepicker">
+                                    <input type="text" class="form-control datetimepicker-input"id="filterBefore" style="width: 80%" />
+                                    <div class="input-group-append" data-target="#filterBefore" data-toggle="datetimepicker">
                                             <div class="input-group-text clear-button" onclick="clearSiblingInput(this);"><i class="fa fa-times"></i></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
+                    <div class="col-xs-12 col-md-4">
+                        <h5>By Cost</h5>
+                        
+                    </div>
                 </div>
             </div>
 
