@@ -11,7 +11,7 @@
 
             if($categories != NULL && $categories != ''){
             // $categoryIdList = $conn->real_escape_string($categories);
-            $fetchEventsQuery = "SELECT ID, NAME, VENUE, DATE_FORMAT(START_TIME, '%Y-%m-%dT%TZ') AS START_TIME,DATE_FORMAT(END_TIME, '%Y-%m-%dT%TZ') AS END_TIME, CATEGORY, DESCRIPTION, LINK, PHONE, EMAIL  FROM tbl_events 
+            $fetchEventsQuery = "SELECT ID, NAME, VENUE, APPROVAL_STATUS, DATE_FORMAT(START_TIME, '%Y-%m-%dT%TZ') AS START_TIME,DATE_FORMAT(END_TIME, '%Y-%m-%dT%TZ') AS END_TIME, CATEGORY, DESCRIPTION, LINK, PHONE, EMAIL  FROM tbl_events 
                                 WHERE ID IN ( SELECT EVENT_ID FROM tbl_event_categories WHERE CATEGORY_ID IN ($categories))
                                 ";
 
