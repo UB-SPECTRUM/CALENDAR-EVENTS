@@ -9,6 +9,12 @@
     $categories = EventCategories::getCategoriesForEvent($eventId);
     $eventInfo = Events::getEventInfo($eventId);
     $contacts = EventContacts::getAll($eventId);
+
+    if($eventInfo['ID'] == '' or $eventInfo['APPROVAL_STATUS'] == 'delete'){
+        http_response_code(400);
+        die();
+        exit();
+    }
 ?>
 <html lang="en">
 

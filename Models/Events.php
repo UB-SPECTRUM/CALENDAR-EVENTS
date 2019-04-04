@@ -3,11 +3,27 @@
 
     class Events extends DatabaseConnector {
 
-        public static function getAll($after = '', $before='', $categories='', $cost = ''){
+        public static function getAll($after = '', $before='', $categories='', $cost = '',$start='',$end='', $onlyApproved=FALSE){
             $temparray = array();
             $conn = self::getDB();
 
-            $fetchEventsQuery = "SELECT ID, NAME, VENUE, APPROVAL_STATUS, DATE_FORMAT(START_TIME, '%Y-%m-%dT%TZ') AS START_TIME,DATE_FORMAT(END_TIME, '%Y-%m-%dT%TZ') AS END_TIME, CATEGORY, DESCRIPTION, LINK, PHONE, EMAIL  FROM tbl_events WHERE APPROVAL_STATUS <>'delete' ";
+            $fetchEventsQuery = "SELECT ID, NAME, VENUE, APPROVAL_STATUS, DATE_FORMAT(START_TIME, '%Y-%m-%dT%TZ') AS START_TIME,DATE_FORMAT(END_TIME, '%Y-%m-%dT%TZ') AS END_TIME, CATEGORY, DESCRIPTION, LINK, PHONE, EMAIL  FROM tbl_events ";
+
+            if($onlyApproved){
+                $fetchEventsQuery .= " WHERE APPROVAL_STATUS = 'accepted' ";
+            } else {
+                $fetchEventsQuery .= " WHERE APPROVAL_STATUS <>'delete' ";
+            }
+
+            if($start != '' ){
+                $start = $conn->real_escape_string($start);
+                $fetchEventsQuery .= " AND START_TIME >= '$start' ";
+            }
+
+            if($end != '' ){
+                $end = $conn->real_escape_string($end);
+                $fetchEventsQuery .= " AND END_TIME <= '$end' ";
+            }
 
             if($categories != NULL && $categories != ''){
             // $categoryIdList = $conn->real_escape_string($categories);

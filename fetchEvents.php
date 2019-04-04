@@ -16,9 +16,11 @@
     $after = htmlentities($after);
     $before = htmlentities($before);
     $cost = htmlentities($cost);
+    $start = htmlentities($start);
+    $end = htmlentities($end);
     
     try {
-        $result = Events::getAll($after, $before, $categories, $cost);
+        $result = Events::getAll($after, $before, $categories, $cost,$start, $end);
         $formattedResults = array();
 
 

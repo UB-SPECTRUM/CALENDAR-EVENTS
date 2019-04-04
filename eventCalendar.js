@@ -214,10 +214,7 @@ $(document).ready(function() {
 		allowInput: true,
 		altInput: true,
 		dateFormat: "H:i",
-		onClose: function(){
-			$('#calendar').fullCalendar('rerenderEvents');
-			$('#calendar').fullCalendar('refetchEvents');
-		}
+		onClose: handleTime
 
 
 
@@ -229,10 +226,7 @@ $(document).ready(function() {
 		allowInput: true,
 		altInput: true,
 		dateFormat: "H:i",
-		onClose: function(){
-			$('#calendar').fullCalendar('rerenderEvents');
-			$('#calendar').fullCalendar('refetchEvents');
-		}
+		onClose: handleTime
 	});
 
 	$($('#filterAfter').siblings('input')[0]).attr('style', 'width: 70%') //fix clear button going to next line
@@ -240,3 +234,37 @@ $(document).ready(function() {
 
 	
 });
+
+function handleTime(){
+	let afterTime = $('#filterAfter').val();
+	let beforeTime = $('#filterBefore').val()
+
+	let visibleSibling = $($(this).siblings('input')[0]);
+	let afterTimeVisibleSibling = $($('#filterAfter').siblings('input')[0]);
+	let beforeTimeVisibleSibling = $($('#filterBefore').siblings('input')[0]);
+	
+	if(beforeTime == '' || afterTime == ''){
+		$('#calendar').fullCalendar('rerenderEvents');
+		$('#calendar').fullCalendar('refetchEvents');
+	}
+
+	let happensBeforeEnd = false;
+	if(Date.parse('01/01/2011 ' + afterTime) <= Date.parse('01/01/2011 ' + beforeTime)){
+		happensBeforeEnd = true;
+	} else {
+		happensBeforeEnd = false;
+	}
+
+	if (happensBeforeEnd) {
+		afterTimeVisibleSibling.removeClass('is-invalid');
+		beforeTimeVisibleSibling.removeClass('is-invalid');
+
+		$('#calendar').fullCalendar('rerenderEvents');
+		$('#calendar').fullCalendar('refetchEvents');
+	} else {
+		afterTimeVisibleSibling.addClass('is-invalid');
+		beforeTimeVisibleSibling.addClass('is-invalid');
+	}
+
+	
+}

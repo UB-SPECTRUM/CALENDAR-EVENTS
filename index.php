@@ -100,7 +100,7 @@
                         <h5>By Time</h5>
                         <div class="row">
                             <div class="col-xs-12 col-md-6">
-                                <label>After</label>
+                                <label>From</label>
                                 <div class="input-group date" data-target-input="nearest">
                                     <input type="text" class="form-control" id="filterAfter" style="width: 80%" />
                                     <div class="input-group-append" data-target="#filterAfter" data-toggle="datetimepicker">
@@ -109,7 +109,7 @@
                                 </div>
                             </div>
                             <div class="col-xs-12 col-md-6">
-                                <label>Before</label>
+                                <label>To</label>
                                 <div class="input-group date"  data-target-input="nearest">
                                     <input type="text" class="form-control datetimepicker-input"id="filterBefore" style="width: 80%" />
                                     <div class="input-group-append" data-target="#filterBefore" data-toggle="datetimepicker">
