@@ -10,7 +10,7 @@
     $eventInfo = Events::getEventInfo($eventId);
     $contacts = EventContacts::getAll($eventId);
 
-    if($eventInfo['ID'] == '' or $eventInfo['APPROVAL_STATUS'] == 'delete'){
+    if($eventInfo['ID'] == '' or $eventInfo['APPROVAL_STATUS'] == 'delete' or $eventInfo['APPROVAL_STATUS'] == 'pending'){
         http_response_code(400);
         die();
         exit();
@@ -167,7 +167,20 @@
             </div>
         </div>
         <div class="col-xs-12 col-md-4">
-            <img data-pdf-thumbnail-file="/ubspectrum/events/downloadEventFlyer.php?eventId=<?php echo $eventId ?>">
+            <?php
+                $attachmentType = $eventInfo['ADDITIONAL_FILE_TYPE'];
+                if (strpos($attachmentType, 'pdf') !== false) {
+                    echo '<img data-pdf-thumbnail-file="/ubspectrum/events/downloadEventFlyer.php?eventId=$eventId">';
+                } 
+                if (strpos($attachmentType, 'image') !== false) {
+                    $imageData = $eventInfo['ADDITIONAL_FILE'];
+                    echo '<img src="data:image/png;base64,'.base64_encode($imageData).'">';
+                }
+                else {
+                    echo '<div>No flyer</div>';
+                }
+            ?>
+            
         </div>
         <div class="col-md-2"></div>
 

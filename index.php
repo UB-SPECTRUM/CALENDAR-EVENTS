@@ -150,7 +150,7 @@
         
 
         (function(){
-            let costOptions = [{label:'Less than $10',value:'lt10'}, {label:'$10 - $20 ',value:'lt20'}, {label:'$20 - $50 ',value:'lt50'}, {label:'$50 - $100 ',value:'lt100'}, {label:'More than $100 ',value:'gt100'}];
+            let costOptions = [{label:'All',value:''},{label:'Less than $10',value:'lt10'}, {label:'$10 - $20 ',value:'lt20'}, {label:'$20 - $50 ',value:'lt50'}, {label:'$50 - $100 ',value:'lt100'}, {label:'More than $100 ',value:'gt100'}];
             let costOptionElems = costOptions.map(op => {
                 return `<a class="dropdown-item" onclick="javascript:handleCost(this);" data-val="${op.value}">
                                     ${op.label}

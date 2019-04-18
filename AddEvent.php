@@ -1,9 +1,4 @@
-<?php
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-session_start();
-
- ?>
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html>
 
@@ -32,7 +27,7 @@ session_start();
 
         var categories;
         categories = [
-            <?php 
+            <?php
         foreach ($categories as $value) {
             $label = $value['NAME'];
             $icon = $value['ICON'];
@@ -98,6 +93,7 @@ session_start();
         function handleContactInfoType(radio) {
             let infoType = radio.value;
             let infoTargetElem = $('#' + radio.name.replace('_opt', ''));
+            let infoTargetErrorElem = $('#' + radio.name.replace('_opt', '') + '_error' );
             switch (infoType) {
                 case 'phone':
                     infoTargetElem.attr('type', 'text');
@@ -120,7 +116,7 @@ session_start();
             let visibleSibling = $($(this).siblings('input')[0]);
             let startVisibleSibling = $($('#start_time').siblings('input')[0]);
             let endVisibleSibling = $($('#end_time').siblings('input')[0]);
-            
+
             if(endTime == '' || startTime == ''){
                 return;
             }
@@ -141,9 +137,14 @@ session_start();
                 endVisibleSibling.removeClass('is-valid').addClass('is-invalid');
                 // visibleSibling.removeClass('is-valid').addClass('is-invalid');
             }
-            
+
         }
 
+ 		function removeErrorStyling(){
+            let input = $(this);
+            input.removeClass('is-invalid').removeClass('is-valid')
+
+        }
 
         function validateInput() {
             let input = $(this);
@@ -185,6 +186,12 @@ session_start();
                 case 'time':
                     break;
                 case 'email':
+                 let emailPatternMatches = value.match(/(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/);
+                    if (emailPatternMatches != null) {
+                        isValid = true;
+                    } else {
+                        isValid = false;
+                    }
                     break;
                 case 'phone':
                     let phonePatternMatches = value.match('\\d{3}[\\-]?\\d{3}[\\-]?\\d{4}');
@@ -247,12 +254,60 @@ session_start();
             tagify.DOM.scope.parentNode.insertBefore(tagify.DOM.input, tagify.DOM.scope);
             makeCategoryOptions();
 
-            $('input').on('blur', validateInput);
+             $('input').on('blur', validateInput);
+            $('input').on('keydown', removeErrorStyling);
+            $($('#start_time').siblings('input')[0]).off('blur');
+            $($('#end_time').siblings('input')[0]).off('blur');
             $('#contact-section').on('blur','input', validateInput);
+            $('#contact-section').on('keydown','input', removeErrorStyling);
             $('#start_time').on('change', handleTime);
             $('#end_time').on('change', handleTime);
             $('textarea').on('blur', validateInput);
+            $('textarea').on('keydown', removeErrorStyling);
         })
+
+        function makeRecurring() {
+          var repeat = document.getElementById("rDiv"),
+              lDay = document.getElementById("lDiv");
+
+          if (repeat && lDay) {
+            document.getElementById("recurBtn").innerHTML = "Make Recurring";
+            repeat.remove();
+            document.getElementById("r2Div").remove();
+            lDay.remove();
+            document.getElementById("l2Div").remove();
+          } else {
+            document.getElementById("recurBtn").innerHTML = "Cancel Recurring";
+            var recurring = `<div id="rDiv" class="col-xs-12 col-md-4 text-md-right">
+                                <label for="repeat">Repeat</label>
+                            </div>
+                            <div id="r2Div" class="col-xs-12 col-md-3 col-lg-2">
+                              <select id="repeat" name="repeat" class="form-control" required>
+                                  <option value="daily">Daily</option>
+                                  <option value="weekly">Weekly</option>
+                                  <option value="monthly">Monthly</option>
+                              </select>
+                            </div>`;
+
+                var lastDay= `<div id="lDiv" class="col-xs-12 col-md-4 text-md-right">
+                                <label for="lastDay">Last Day<span class="required">*</span></label>
+                            </div>
+                            <div id="l2Div" class="col-xs-12 col-md-3 col-lg-2">
+                                <input type="text" name="lastDay" id="lastDay" placeholder="Click to Select Time" class="form-control" maxlength="10" required data-type="time"/>
+                            </div>`;
+
+                        $('#repeatDiv').append(recurring);
+                        $('#lastDayDiv').append(lastDay);
+                        $('#lastDay').flatpickr({
+                            // format: 'LT'
+                            enableTime: false,
+                            allowInput: true,
+                            altInput: true,
+                            minDate: "today"
+                        });
+                        $('input').on('blur', validateInput);
+                  }
+        }
     </script>
 
     <script>
@@ -295,6 +350,9 @@ session_start();
                     </div>
                     <div class="col-xs-12 col-md-4">
                         <input type="text" name="contact_${currentContactCount}_name" class="form-control" maxlength="64" required />
+                        <div class="invalid-feedback">
+                            Please enter a name.
+                        </div>
                     </div>
                 </div>
                 <div class="row mb-2">
@@ -316,6 +374,9 @@ session_start();
                         <label>Email</label>&nbsp;<input type="radio" name="contact_${currentContactCount}_info_opt" value="email" checked required onclick="handleContactInfoType(this);"/>&nbsp;&nbsp;
                         <label>Phone</label>&nbsp;<input type="radio" name="contact_${currentContactCount}_info_opt" value="phone" required onclick="handleContactInfoType(this);"/>
                         <input type="email" name="contact_${currentContactCount}_info" id="contact_${currentContactCount}_info" class="form-control" maxlength="64" required data-type="email"/>
+                        <div class="invalid-feedback" id="contact_${currentContactCount}_info_error">
+                            Please enter a valid email.
+                        </div>
                     </div>
                 </div>
             </div>
@@ -353,8 +414,6 @@ session_start();
 
             switch (ext.toLowerCase()) {
                 case 'pdf':
-                    // case 'jpg':
-                    // case 'png':
                     var filePath = URL.createObjectURL(file);
                     pdfjsLib.getDocument(filePath).promise.then(function (doc) {
                             // var pages = []; while (pages.length < doc.numPages) pages.push(pages.length + 1);
@@ -367,8 +426,20 @@ session_start();
                         })
                         .catch(console.error);
                     break;
+                case 'jpg':
+                case 'png':
+                    var filePath = URL.createObjectURL(file);
+                    var div = document.createElement("div");
+                    var img = document.createElement('img');
+                    img.src = filePath;
+                    div.appendChild(img);
+
+                    $('#flyer-section').append(div);
+                    break;
+
+
                 default:
-                    alert('Sorry, only PDF files are allowed as the flyer');
+                    alert('Sorry, only PDF, JPG, or PNG files are allowed as the flyer');
                     this.value = '';
             }
         };
@@ -376,18 +447,23 @@ session_start();
         function handleContactInfoType(radio){
             let infoType = radio.value;
             let infoTargetElem = $('#' + radio.name.replace('_opt', ''));
+            let infoTargetErrorElem = $('#' + radio.name.replace('_opt', '') + '_error');
             switch(infoType){
                 case 'phone':
-                    infoTargetElem.attr('type', 'text' );
-                    infoTargetElem.attr('pattern', '\\d{3}[\\-]?\\d{3}[\\-]?\\d{4}' );
-
+                infoTargetElem.attr('type', 'text' );
+                infoTargetElem.data('type', 'phone' );
+                infoTargetElem.attr('pattern', '\\d{3}[\\-]?\\d{3}[\\-]?\\d{4}' );
+                infoTargetErrorElem.html('Please enter a valid U.S. phone number.');
                     break;
                 case 'email':
-                    infoTargetElem.attr('type', 'email' );
-                    infoTargetElem.removeAttr('pattern');
-
+                infoTargetElem.attr('type', 'email' );
+                infoTargetElem.data('type', 'email' );
+                infoTargetElem.removeAttr('pattern');
+                infoTargetErrorElem.html('Please enter a valid email.');
                 break;
             }
+
+            validateInput.bind(infoTargetElem).call();
         }
     </script>
     <?php
@@ -411,7 +487,10 @@ session_start();
                     <label for="poster_email">Posters Email<span class="required">*</span></label>
                 </div>
                 <div class="col-xs-12 col-md-4">
-                    <input type="email" name="addedBy" id="addedBy" class="form-control" maxlength="64" required />
+                    <input type="email" name="addedBy" id="addedBy" class="form-control" maxlength="64" required data-type="email"/>
+                    <div class="invalid-feedback" >
+                            Please enter a valid email.
+                    </div>
                     <p style="font-size:10px;">This email will not be posted on the calendar. By providing your email, you will get a nofication if your event has been Accepted or Declined and a way to update your event.</p>
                 </div>
             </div>
@@ -422,6 +501,9 @@ session_start();
                 <div class="col-xs-12 col-md-4">
                     <input type="text" name="name" id="name" class="form-control" maxlength="64" required
                         data-type="text" />
+                    <div class="invalid-feedback">
+                        Please enter a name.
+                    </div>
                 </div>
             </div>
             <div class="row mb-3">
@@ -431,6 +513,9 @@ session_start();
                 <div class="col-xs-12 col-md-4">
                     <input type="text" name="venue" id="venue" class="form-control" maxlength="64" required
                         data-type="text" />
+                    <div class="invalid-feedback">
+                        Please enter a venue.
+                    </div>
                 </div>
             </div>
             <div class="row mb-3">
@@ -440,6 +525,9 @@ session_start();
                 <div class="col-xs-12 col-md-4">
                     <input type="text" name="link" id="link" class="form-control" maxlength="1024" required
                         data-type="link" />
+                      <div class="invalid-feedback">
+                          Please enter a valid link, such as https://www.ubspectrum.com.
+                      </div>
                 </div>
             </div>
             <div class="row mb-3">
@@ -449,6 +537,19 @@ session_start();
                 <div class="col-xs-12 col-md-4">
                     <textarea type="text" name="description" id="description" class="form-control" maxlength="1000"
                         data-type="text" required></textarea>
+                    <h6 class="pull-right"><span  id="characters">1000</span> characters left</h6>
+                    <div class="invalid-feedback">
+                        Please enter a description.
+                    </div>
+                    <script>
+                    $('#description').keyup(updateCount);
+                    $('#description').keydown(updateCount);
+
+                    function updateCount() {
+                        var cs = $(this).val().length;
+                        $('#characters').text(1000 - cs);
+                    }
+                    </script>
                 </div>
             </div>
             <div class="row mb-3">
@@ -497,7 +598,10 @@ session_start();
                 <div class="col-xs-12 col-md-3 col-lg-2">
                 <div class="input-group">
                     <span class="input-group-addon">$</span>
-                    <input type="number" id="eventCost" min="0" step="0.01" data-number-to-fixed="2" data-number-stepfactor="100" name="cost" id="cost" class="form-control" data-type="money"/>
+                    <input type="number" id="eventCost" min="0" step="1.00" data-number-to-fixed="2" data-number-stepfactor="100" name="cost" id="cost" class="form-control" data-type="money"/>
+                    <div class="invalid-feedback">
+                            Please enter a valid cost, such as 20 or 21.50.
+                    </div>
                 </div>
 
                 </div>
@@ -524,15 +628,32 @@ session_start();
                 </div>
                 <div class="col-xs-12 col-md-3 col-lg-2">
                     <input type="text" name="end_time" id="end_time" placeholder="Click to Select Time" class="form-control" maxlength="10" required data-type="time"/>
+                     <div class="invalid-feedback">
+                            Please make sure the end time is after the start time.
+                        </div>
+                    </div>
                 </div>
             </div>
+            <div class="row mb-3" id="recurring">
+                <div class="col-xs-12 col-md-4 text-md-right">
+                    <!--<label for="makeReccuring">Make Recurring</label>-->
+                </div>
+                <div class="col-xs-12 col-md-3 col-lg-2">
+                    <!--<input type="checkbox" class="form-check-input" id="makeReccuring" onclick=makeRecurring()><br>-->
+                    <button type="button" id="recurBtn" class="btn btn-info" onclick=makeRecurring()>Make Reccuring</button>
+
+                </div>
+            </div>
+            <div class="row mb-3" id="repeatDiv"></div>
+            <div class="row mb-3" id="lastDayDiv"></div>
+
             <div class="row mb-3">
                 <div class="col-xs-12 col-md-4 text-md-right">
                     <label for="flyer">Event Flyer</label>
                 </div>
                 <div class="col-xs-12 col-md-3 col-lg-2">
-                    <input type="file" name="flyer" id="flyer" accept=".pdf" onchange="checkFile(event);" />
-                    <span>* PDF smaller than 16MB Only</span>
+                    <input type="file" name="flyer" id="flyer" accept=".pdf,.jpg,.png" onchange="checkFile(event);" />
+                    <p style="font-size:10px;">* PDF,PNG, or JPG smaller than 16MB Only</p>
                 </div>
             </div>
             <div class="row mb-3">
@@ -560,6 +681,9 @@ session_start();
                     </div>
                     <div class="col-xs-12 col-md-4">
                         <input type="text" name="contact_1_name" class="form-control" maxlength="64" required />
+                        <div class="invalid-feedback">
+                            Please enter a name.
+                        </div>
                     </div>
                 </div>
                 <div class="row mb-2">
@@ -584,6 +708,9 @@ session_start();
                             onclick="handleContactInfoType(this);" />
                         <input type="email" name="contact_1_info" id="contact_1_info" class="form-control"
                             maxlength="64" required data-type="email"/>
+                        <div class="invalid-feedback" id="contact_1_info_error">
+                            Please enter a valid email.
+                        </div>
                     </div>
                 </div>
 
@@ -646,7 +773,7 @@ session_start();
 
         $('form').on('keyup keypress', function(e) {
             var keyCode = e.keyCode || e.which;
-            if (keyCode === 13) { 
+            if (keyCode === 13) {
                 e.preventDefault();
                 return false;
             }

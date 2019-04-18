@@ -122,7 +122,7 @@ $(document).ready(function() {
 		footer: {
 			left: '',
 			center: '',
-			right: 'addButton prev,next'
+			right: 'updateButton addButton prev,next'
 		},
 		// events: testEvents,
 		events: {
@@ -141,7 +141,7 @@ $(document).ready(function() {
 					let notificationDiv = `<div class="alert alert-primary" role="alert" style="display:none;">
 						Looks like no events matched the filters!
 					</div>`;
-					
+
 					$('#notification-section').html(notificationDiv)
 					$('#notification-section').children().show(300)
 				} else {
@@ -177,6 +177,12 @@ $(document).ready(function() {
 				text: 'Add an Event',
 				click: function(event, el) {
 					window.location.href = `/ubspectrum/events/AddEvent.php`;
+				}
+			},
+			updateButton: {
+				text: 'Submit an Update',
+				click: function(event, el) {
+					window.location.href = `/ubspectrum/events/submitUpdate.php`;
 				}
 			}
 		},
@@ -232,7 +238,7 @@ $(document).ready(function() {
 	$($('#filterAfter').siblings('input')[0]).attr('style', 'width: 70%') //fix clear button going to next line
 	$($('#filterBefore').siblings('input')[0]).attr('style', 'width: 70%')
 
-	
+
 });
 
 function handleTime(){
@@ -242,7 +248,7 @@ function handleTime(){
 	let visibleSibling = $($(this).siblings('input')[0]);
 	let afterTimeVisibleSibling = $($('#filterAfter').siblings('input')[0]);
 	let beforeTimeVisibleSibling = $($('#filterBefore').siblings('input')[0]);
-	
+
 	if(beforeTime == '' || afterTime == ''){
 		$('#calendar').fullCalendar('rerenderEvents');
 		$('#calendar').fullCalendar('refetchEvents');
@@ -266,5 +272,5 @@ function handleTime(){
 		beforeTimeVisibleSibling.addClass('is-invalid');
 	}
 
-	
+
 }

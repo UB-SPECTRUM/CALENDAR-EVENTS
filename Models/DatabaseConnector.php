@@ -2,10 +2,10 @@
 
 
      class DatabaseConnector {
-        private const hostname = "localhost";
-        private const dbusername = "root"; //getenv("UB_SPECTRUM_DB_USER");
-        private const dbpassword = "pass";
-        private const dbName = "ubspectrum"; //getenv("UB_SPECTRUM_DB");
+        private const hostname = "";
+        private const dbusername = "";
+        private const dbpassword = "";
+        private const dbName = ""; 
         private static $conn;
        
         protected static function getDB(){

@@ -3,8 +3,7 @@
     header("access-control-allow-origin: *");
 
     require_once "Models/Events.php";
-
-
+    require_once "Models/EmailManager.php";
 
     $name = $_POST['name'] or '';
     $venue = $_POST['venue'] or '';
@@ -46,7 +45,7 @@
    $eventId = htmlentities($eventId);
    $ub_campus = htmlentities($ub_campus);
    $categories = htmlentities($categories);
-
+   $start = $start_time;
     $start_time = "$date $start_time";
     $end_time = "$date $end_time";
 
@@ -63,8 +62,33 @@
         $contacts[] = array('name'=> $contactName, 'type' => $contactType, 'info' => $contactInfo);
     }
 
-    Events::addEvent($name, $posted_by, $venue, $start_time, $end_time, $description, $link, $cost, "", "", $ub_campus, $flyer, $flyerSize,$flyerType, "pending", $categories, $contacts );
+    $updateToken = uniqid();
+    if (isset($_POST['repeat']) && isset($_POST['lastDay'])) {
+      $repeat = $_POST['repeat'];
+      $lastDay = $_POST['lastDay'];
 
+      $repeat = htmlentities($repeat);
+      $lastDay = htmlentities($lastDay);
+      $lastDay = "$lastDay $start";
+
+      Events::addRecurringEvent($repeat, $lastDay, $name, $posted_by, $venue, $start_time, $end_time, $description, $link, $cost, "", "", $ub_campus, $flyer, $flyerSize,$flyerType, "pending", $categories, $contacts, $updateToken );
+    } else {
+      Events::addEvent($name, $posted_by, $venue, $start_time, $end_time, $description, $link, $cost, "", "", $ub_campus, $flyer, $flyerSize,$flyerType, "pending", $categories, $contacts, $updateToken );
+    }
+
+
+    if ($_SESSION == array() || !isset($_SESSION['sessionID'])) {
+
+      $mail = new SpectrumEmail();
+      $userSubject = "Your event $name was submitted for review";
+      $userMessage = "The event $name at $venue for $start_time to $end_time has been submitted for review. An administrator will review the details of the event and accept or reject the submission. A follow-up email will be sent with the decision. If you need to make updates to the event, you will need to use this Update Token: $updateToken. Thank you, UB Spectrum";
+      $userHTMLMessage = "
+        Hi there,<br/>The event <b>$name</b> at $venue for $start_time to $end_time has been submitted for review. An administrator will review the details of the event and accept or reject the submission. A follow-up email will be sent with the decision.<br/> If you need to make updates to the event, you will need to use this Update Token:<br/><br/> <h2>$updateToken<h2><br/><br/> Thank you<br/>,UB Spectrum
+      ";
+
+      $mail->sendMessage(array($posted_by), $userSubject,$userHTMLMessage,$userMessage);
+
+    }
     if ($_SESSION == array() || !isset($_SESSION['sessionID'])) {
       $referer = dirname($_SERVER["HTTP_REFERER"]);
       header("Location: $referer");
